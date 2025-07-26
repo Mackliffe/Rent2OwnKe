@@ -22,6 +22,28 @@ export default function Home() {
 
   const { data: searchResults, isLoading: loadingSearch } = useQuery<Property[]>({
     queryKey: ["/api/properties/search", searchFilters],
+    queryFn: async () => {
+      // Convert search filters to API format
+      const params = new URLSearchParams();
+      
+      if (searchFilters.city !== "all") {
+        params.append("city", searchFilters.city);
+      }
+      
+      if (searchFilters.propertyType !== "all") {
+        params.append("propertyType", searchFilters.propertyType);
+      }
+      
+      if (searchFilters.priceRange !== "all") {
+        const [minPrice, maxPrice] = searchFilters.priceRange.split("-").map(Number);
+        if (minPrice) params.append("minPrice", minPrice.toString());
+        if (maxPrice) params.append("maxPrice", maxPrice.toString());
+      }
+      
+      const response = await fetch(`/api/properties/search?${params.toString()}`);
+      if (!response.ok) throw new Error("Failed to search properties");
+      return response.json();
+    },
     enabled: !!(searchFilters.city !== "all" || searchFilters.propertyType !== "all" || searchFilters.priceRange !== "all"),
   });
 
