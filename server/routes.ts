@@ -27,27 +27,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get property by ID
-  app.get("/api/properties/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid property ID" });
-      }
-
-      const property = await storage.getProperty(id);
-      if (!property) {
-        return res.status(404).json({ message: "Property not found" });
-      }
-
-      res.json(property);
-    } catch (error) {
-      console.error("Error getting property:", error);
-      res.status(500).json({ message: "Failed to fetch property" });
-    }
-  });
-
-  // Search properties
+  // Search properties (must come before the :id route)
   app.get("/api/properties/search", async (req, res) => {
     try {
       const filters: PropertySearchFilters = {
@@ -64,6 +44,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error searching properties:", error);
       res.status(500).json({ message: "Failed to search properties" });
+    }
+  });
+
+  // Get property by ID (must come after search route)
+  app.get("/api/properties/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
+      const property = await storage.getProperty(id);
+      if (!property) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+
+      res.json(property);
+    } catch (error) {
+      console.error("Error getting property:", error);
+      res.status(500).json({ message: "Failed to fetch property" });
     }
   });
 
