@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage, type PropertySearchFilters } from "./storage";
+import { kenyanRealEstateAPI } from "./api-integrations";
 import { z } from "zod";
 import type { CalculatorParams, CalculatorResult, PaymentScheduleItem } from "@shared/schema";
 
@@ -32,15 +33,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const filters: PropertySearchFilters = {
         city: req.query.city as string,
-        propertyType: req.query.propertyType as string,
+        type: req.query.type as string,
         minPrice: req.query.minPrice ? parseInt(req.query.minPrice as string) : undefined,
         maxPrice: req.query.maxPrice ? parseInt(req.query.maxPrice as string) : undefined,
         bedrooms: req.query.bedrooms ? parseInt(req.query.bedrooms as string) : undefined,
         bathrooms: req.query.bathrooms ? parseInt(req.query.bathrooms as string) : undefined,
       };
 
-      const properties = await storage.searchProperties(filters);
-      res.json(properties);
+      // Get properties from local storage
+      const localProperties = await storage.searchProperties(filters);
+      
+      // Get properties from external Kenyan APIs
+      let externalProperties: any[] = [];
+      try {
+        const apiResults = await kenyanRealEstateAPI.searchProperties(filters);
+        externalProperties = apiResults.map((apiProp, index) => ({
+          ...kenyanRealEstateAPI.convertToInternalProperty(apiProp),
+          id: 1000 + index, // Use numeric IDs for external properties
+          isExternal: true,
+        }));
+      } catch (apiError) {
+        console.warn("External API search failed:", apiError);
+      }
+
+      // Combine local and external results
+      const allProperties = [...localProperties, ...externalProperties];
+      
+      res.json(allProperties);
     } catch (error) {
       console.error("Error searching properties:", error);
       res.status(500).json({ message: "Failed to search properties" });

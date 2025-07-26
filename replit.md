@@ -44,9 +44,11 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
 
 ### Backend Services
 - **Property Service**: CRUD operations for property management
-- **Search Service**: Advanced property filtering and search
+- **Search Service**: Advanced property filtering and search with external API integration
 - **Calculator Service**: Rent-to-own payment calculations
-- **Storage Layer**: Abstract storage interface with in-memory implementation
+- **Storage Layer**: PostgreSQL database with Drizzle ORM
+- **API Integration Service**: Multi-source property data aggregation from Kenyan real estate APIs
+- **Mock Data Service**: Demonstration data for API integration testing
 
 ## Data Flow
 
@@ -100,6 +102,15 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
   - Integrated property search with city, type, and budget filters
   - Added responsive design for mobile and desktop viewing
   - Fixed Select component issues and ensured smooth user experience
+  
+- January 26, 2025: Integrated Kenyan Real Estate APIs
+  - Built comprehensive API integration system for major Kenyan real estate platforms
+  - Created API aggregator service supporting Kenya Property Portal, BuyRentKenya, and PropertyPoint Kenya
+  - Implemented mock data system for demonstration and testing purposes
+  - Added API Settings page for users to configure API keys and test connections
+  - Enhanced property search to include external API results alongside local data
+  - Added external property markers and data source indicators
+  - Created flexible API conversion system to normalize different property data formats
 
 ## Changelog
 - June 28, 2025: Initial setup

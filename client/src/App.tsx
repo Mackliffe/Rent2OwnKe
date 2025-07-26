@@ -8,6 +8,7 @@ import PropertyDetails from "@/pages/property-details";
 import Calculator from "@/pages/calculator";
 import SignUp from "@/pages/signup";
 import SignIn from "@/pages/signin";
+import APISettings from "@/pages/api-settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/calculator" component={Calculator} />
       <Route path="/signup" component={SignUp} />
       <Route path="/signin" component={SignIn} />
+      <Route path="/api-settings" component={APISettings} />
       <Route component={NotFound} />
     </Switch>
   );

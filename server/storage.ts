@@ -19,7 +19,7 @@ export interface IStorage {
 
 export type PropertySearchFilters = {
   city?: string;
-  propertyType?: string;
+  type?: string;
   minPrice?: number;
   maxPrice?: number;
   bedrooms?: number;
@@ -55,8 +55,8 @@ export class DatabaseStorage implements IStorage {
       conditions.push(eq(properties.city, filters.city));
     }
 
-    if (filters.propertyType) {
-      conditions.push(eq(properties.propertyType, filters.propertyType));
+    if (filters.type) {
+      conditions.push(eq(properties.propertyType, filters.type));
     }
 
     if (filters.minPrice) {
@@ -309,8 +309,8 @@ export class MemStorage implements IStorage {
       results = results.filter(p => p.city.toLowerCase() === filters.city!.toLowerCase());
     }
 
-    if (filters.propertyType) {
-      results = results.filter(p => p.propertyType.toLowerCase() === filters.propertyType!.toLowerCase());
+    if (filters.type) {
+      results = results.filter(p => p.propertyType.toLowerCase() === filters.type!.toLowerCase());
     }
 
     if (filters.minPrice) {

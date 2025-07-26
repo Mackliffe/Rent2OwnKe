@@ -39,8 +39,13 @@ export default function Navigation() {
           </div>
           
           <div className="flex items-center space-x-4">
+            <Link href="/api-settings">
+              <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                API Settings
+              </Button>
+            </Link>
             <Link href="/signin">
-              <Button variant="ghost" className="text-grass-600 hover:text-grass-700">
+              <Button variant="ghost" className="text-green-600 hover:text-green-700">
                 Sign In
               </Button>
             </Link>
