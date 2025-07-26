@@ -1,4 +1,6 @@
 import { properties, locations, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   // Properties
@@ -23,6 +25,79 @@ export type PropertySearchFilters = {
   bedrooms?: number;
   bathrooms?: number;
 };
+
+export class DatabaseStorage implements IStorage {
+  async getProperties(): Promise<Property[]> {
+    return await db.select().from(properties);
+  }
+
+  async getProperty(id: number): Promise<Property | undefined> {
+    const [property] = await db.select().from(properties).where(eq(properties.id, id));
+    return property || undefined;
+  }
+
+  async getFeaturedProperties(): Promise<Property[]> {
+    return await db.select().from(properties).where(eq(properties.featured, true));
+  }
+
+  async getPropertiesByCity(city: string): Promise<Property[]> {
+    return await db.select().from(properties).where(eq(properties.city, city));
+  }
+
+  async getPropertiesByType(propertyType: string): Promise<Property[]> {
+    return await db.select().from(properties).where(eq(properties.propertyType, propertyType));
+  }
+
+  async searchProperties(filters: PropertySearchFilters): Promise<Property[]> {
+    const conditions: any[] = [];
+
+    if (filters.city) {
+      conditions.push(eq(properties.city, filters.city));
+    }
+
+    if (filters.propertyType) {
+      conditions.push(eq(properties.propertyType, filters.propertyType));
+    }
+
+    if (filters.minPrice) {
+      conditions.push(gte(properties.price, filters.minPrice));
+    }
+
+    if (filters.maxPrice) {
+      conditions.push(lte(properties.price, filters.maxPrice));
+    }
+
+    if (filters.bedrooms) {
+      conditions.push(gte(properties.bedrooms, filters.bedrooms));
+    }
+
+    if (filters.bathrooms) {
+      conditions.push(gte(properties.bathrooms, filters.bathrooms));
+    }
+
+    if (conditions.length > 0) {
+      return await db.select().from(properties).where(and(...conditions));
+    }
+
+    return await db.select().from(properties);
+  }
+
+  async createProperty(insertProperty: InsertProperty): Promise<Property> {
+    const [property] = await db
+      .insert(properties)
+      .values(insertProperty)
+      .returning();
+    return property;
+  }
+
+  async getLocations(): Promise<Location[]> {
+    return await db.select().from(locations);
+  }
+
+  async getLocationsByCity(city: string): Promise<Location[]> {
+    return await db.select().from(locations).where(eq(locations.city, city));
+  }
+}
 
 export class MemStorage implements IStorage {
   private properties: Map<number, Property>;
@@ -275,4 +350,174 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
+
+// Initialize database with sample data
+export async function initializeDatabase() {
+  try {
+    // Check if locations already exist
+    const existingLocations = await storage.getLocations();
+    if (existingLocations.length === 0) {
+      // Insert sample locations
+      const kenyanLocations: InsertLocation[] = [
+        { name: "Westlands", city: "Nairobi", county: "Nairobi" },
+        { name: "Karen", city: "Nairobi", county: "Nairobi" },
+        { name: "Kilimani", city: "Nairobi", county: "Nairobi" },
+        { name: "Lavington", city: "Nairobi", county: "Nairobi" },
+        { name: "Nyali", city: "Mombasa", county: "Mombasa" },
+        { name: "Bamburi", city: "Mombasa", county: "Mombasa" },
+        { name: "Milimani", city: "Kisumu", county: "Kisumu" },
+        { name: "Kileleshwa", city: "Nairobi", county: "Nairobi" },
+      ];
+
+      await db.insert(locations).values(kenyanLocations);
+    }
+
+    // Check if properties already exist
+    const existingProperties = await storage.getProperties();
+    if (existingProperties.length === 0) {
+      const sampleRooms: PropertyRoom[] = [
+        {
+          id: "living",
+          name: "Living Room",
+          type: "living_room",
+          image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          description: "Spacious living area with modern furnishings",
+          dimensions: "4m x 5m"
+        },
+        {
+          id: "kitchen",
+          name: "Kitchen",
+          type: "kitchen",
+          image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          description: "Modern kitchen with fitted appliances",
+          dimensions: "3m x 4m"
+        },
+        {
+          id: "master_bedroom",
+          name: "Master Bedroom",
+          type: "bedroom",
+          image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          description: "Large master bedroom with ensuite",
+          dimensions: "4m x 4m"
+        },
+        {
+          id: "bathroom",
+          name: "Master Bathroom",
+          type: "bathroom",
+          image: "https://images.unsplash.com/photo-1620626011761-996317b8d101?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          description: "Modern bathroom with premium fittings",
+          dimensions: "2m x 3m"
+        }
+      ];
+
+      const kenyanProperties: InsertProperty[] = [
+        {
+          title: "Modern 3BR Apartment",
+          description: "Luxurious 3-bedroom apartment in the heart of Westlands with stunning city views and modern amenities.",
+          propertyType: "apartment",
+          location: "Westlands",
+          city: "Nairobi",
+          county: "Nairobi",
+          price: 8500000,
+          bedrooms: 3,
+          bathrooms: 2,
+          floorArea: 120,
+          parkingSpaces: 1,
+          hasGarden: false,
+          amenities: ["Swimming Pool", "Gym", "Security", "Backup Generator", "Elevator"],
+          mainImage: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          gallery: [
+            "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+            "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+          ],
+          rooms: sampleRooms,
+          monthlyRent: 45000,
+          downPaymentPercent: 10,
+          ownershipPeriod: 15,
+          interestRate: "12.5",
+          featured: true,
+        },
+        {
+          title: "Family House with Garden",
+          description: "Beautiful 4-bedroom family house in Karen with a large garden, perfect for growing families.",
+          propertyType: "house",
+          location: "Karen",
+          city: "Nairobi",
+          county: "Nairobi",
+          price: 15200000,
+          bedrooms: 4,
+          bathrooms: 3,
+          floorArea: 200,
+          parkingSpaces: 2,
+          hasGarden: true,
+          amenities: ["Large Garden", "Security", "Garage", "Study Room", "Servant Quarter"],
+          mainImage: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          gallery: [
+            "https://images.unsplash.com/photo-1523217582562-09d0def993a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+          ],
+          rooms: sampleRooms,
+          monthlyRent: 85000,
+          downPaymentPercent: 15,
+          ownershipPeriod: 15,
+          interestRate: "12.0",
+          featured: true,
+        },
+        {
+          title: "Ocean View Apartment",
+          description: "Stunning 2-bedroom beachfront apartment in Nyali with panoramic ocean views.",
+          propertyType: "apartment",
+          location: "Nyali",
+          city: "Mombasa",
+          county: "Mombasa",
+          price: 12800000,
+          bedrooms: 2,
+          bathrooms: 2,
+          floorArea: 95,
+          parkingSpaces: 1,
+          hasGarden: false,
+          amenities: ["Ocean View", "Swimming Pool", "Beach Access", "Security", "Backup Generator"],
+          mainImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          gallery: [
+            "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+          ],
+          rooms: sampleRooms.slice(0, 3), // 2BR apartment
+          monthlyRent: 68000,
+          downPaymentPercent: 12,
+          ownershipPeriod: 12,
+          interestRate: "13.0",
+          featured: true,
+        },
+        {
+          title: "Kilimani Modern Apartment",
+          description: "Contemporary 2-bedroom apartment in Kilimani with modern finishes and amenities.",
+          propertyType: "apartment",
+          location: "Kilimani",
+          city: "Nairobi",
+          county: "Nairobi",
+          price: 6800000,
+          bedrooms: 2,
+          bathrooms: 2,
+          floorArea: 85,
+          parkingSpaces: 1,
+          hasGarden: false,
+          amenities: ["Gym", "Security", "Backup Generator", "Internet"],
+          mainImage: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+          gallery: [],
+          rooms: sampleRooms.slice(0, 3),
+          monthlyRent: 38000,
+          downPaymentPercent: 10,
+          ownershipPeriod: 15,
+          interestRate: "12.5",
+          featured: false,
+        }
+      ];
+
+      await db.insert(properties).values(kenyanProperties as any);
+    }
+
+    console.log("Database initialized successfully");
+  } catch (error) {
+    console.error("Error initializing database:", error);
+  }
+}

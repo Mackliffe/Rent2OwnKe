@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, decimal, boolean, jsonb } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -33,6 +34,18 @@ export const locations = pgTable("locations", {
   city: text("city").notNull(),
   county: text("county").notNull(),
 });
+
+// Define relations
+export const propertiesRelations = relations(properties, ({ one }) => ({
+  location: one(locations, {
+    fields: [properties.city],
+    references: [locations.city],
+  }),
+}));
+
+export const locationsRelations = relations(locations, ({ many }) => ({
+  properties: many(properties),
+}));
 
 // Types for property rooms
 export type PropertyRoom = {
