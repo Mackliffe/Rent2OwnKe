@@ -82,7 +82,7 @@ export default function PropertySearch({ onSearch }: PropertySearchProps) {
         </div>
         
         <div className="md:col-span-1 flex items-end">
-          <Button onClick={handleSearch} className="w-full bg-grass-500 hover:bg-grass-600 text-white">
+          <Button onClick={handleSearch} className="w-full bg-green-600 hover:bg-green-700 text-white">
             <Search className="mr-2 h-4 w-4" />
             Search Properties
           </Button>
