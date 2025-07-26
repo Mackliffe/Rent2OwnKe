@@ -73,7 +73,7 @@ export default function SignUp() {
                   value={formData.fullName}
                   onChange={handleInputChange}
                   required
-                  className="focus:ring-grass-500 focus:border-grass-500"
+                  className="focus:ring-green-500 focus:border-green-500"
                 />
               </div>
 
@@ -87,7 +87,7 @@ export default function SignUp() {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="focus:ring-grass-500 focus:border-grass-500"
+                  className="focus:ring-green-500 focus:border-green-500"
                 />
               </div>
 
@@ -101,7 +101,7 @@ export default function SignUp() {
                   value={formData.phone}
                   onChange={handleInputChange}
                   required
-                  className="focus:ring-grass-500 focus:border-grass-500"
+                  className="focus:ring-green-500 focus:border-green-500"
                 />
               </div>
 
@@ -115,7 +115,7 @@ export default function SignUp() {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="focus:ring-grass-500 focus:border-grass-500"
+                  className="focus:ring-green-500 focus:border-green-500"
                 />
               </div>
 
@@ -129,13 +129,13 @@ export default function SignUp() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
-                  className="focus:ring-grass-500 focus:border-grass-500"
+                  className="focus:ring-green-500 focus:border-green-500"
                 />
               </div>
 
               <Button 
                 type="submit" 
-                className="w-full bg-grass-600 hover:bg-grass-700 text-white"
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
               >
                 Create Account
               </Button>
