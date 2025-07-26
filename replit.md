@@ -91,8 +91,19 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
 - **Build Process**: Unified build script for frontend and backend
 - **Asset Serving**: Express serves static files in production
 
+## Recent Changes
+- January 26, 2025: Successfully deployed complete Kenya-focused rent-to-own real estate platform
+  - Implemented KES currency formatting and Kenyan location data (Nairobi, Mombasa, Kisumu)
+  - Added grass-green color scheme throughout the application
+  - Built interactive room viewer with property interior galleries
+  - Created comprehensive rent-to-own calculator with Kenya-specific interest rates
+  - Integrated property search with city, type, and budget filters
+  - Added responsive design for mobile and desktop viewing
+  - Fixed Select component issues and ensured smooth user experience
+
 ## Changelog
-- June 28, 2025. Initial setup
+- June 28, 2025: Initial setup
+- January 26, 2025: Completed Kenya-focused rent-to-own platform with full functionality
 
 ## User Preferences
 
