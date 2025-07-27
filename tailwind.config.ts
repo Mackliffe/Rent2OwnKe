@@ -61,6 +61,18 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        grass: {
+          50: "var(--grass-50)",
+          100: "var(--grass-100)",
+          200: "var(--grass-200)",
+          300: "var(--grass-300)",
+          400: "var(--grass-400)",
+          500: "var(--grass-500)",
+          600: "var(--grass-600)",
+          700: "var(--grass-700)",
+          800: "var(--grass-800)",
+          900: "var(--grass-900)",
+        },
       },
       keyframes: {
         "accordion-down": {
