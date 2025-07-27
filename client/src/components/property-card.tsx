@@ -2,8 +2,10 @@ import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Maximize, MapPin, Car, Star } from "lucide-react";
+import { Bed, Bath, Maximize, MapPin, Car, Star, CheckCircle, CreditCard } from "lucide-react";
 import { formatKES } from "@/lib/currency";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
 import type { Property } from "@shared/schema";
 
 interface PropertyCardProps {
@@ -11,6 +13,15 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property }: PropertyCardProps) {
+  const { isAuthenticated } = useAuth();
+
+  // Check if user has already applied for this property
+  const { data: applicationStatus } = useQuery({
+    queryKey: [`/api/applications/check/${property.id}`],
+    enabled: !!property.id && isAuthenticated,
+    retry: false,
+  });
+
   const getPropertyTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case 'apartment':
@@ -21,6 +32,16 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleLoanApplication = () => {
+    if (!isAuthenticated) {
+      window.location.href = "/api/login";
+    } else if (applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) {
+      window.location.href = "/dashboard";
+    } else {
+      window.location.href = `/loan-application/${property.id}`;
     }
   };
 
@@ -65,7 +86,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </div>
         </div>
         
-        {property.parkingSpaces > 0 && (
+        {property.parkingSpaces && property.parkingSpaces > 0 && (
           <div className="flex items-center text-sm text-gray-600 mb-4">
             <Car className="h-4 w-4 text-grass-500 mr-1" />
             {property.parkingSpaces} Parking Space{property.parkingSpaces > 1 ? 's' : ''}
@@ -81,11 +102,43 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             <span className="text-lg font-semibold text-grass-600">{formatKES(property.monthlyRent)}/month</span>
             <span className="text-sm text-gray-500">Rent-to-own</span>
           </div>
-          <Link href={`/property/${property.id}`}>
-            <Button className="w-full grass-500 hover:bg-grass-600">
-              View Details
-            </Button>
-          </Link>
+          <div className="space-y-2">
+            <Link href={`/property/${property.id}`}>
+              <Button className="w-full bg-grass-500 hover:bg-grass-600 text-white">
+                View Details
+              </Button>
+            </Link>
+            
+            {/* Loan Application Button */}
+            {!isAuthenticated ? (
+              <Button
+                onClick={handleLoanApplication}
+                variant="outline"
+                className="w-full border-grass-500 text-grass-600 hover:bg-grass-50"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Sign In to Apply
+              </Button>
+            ) : (applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) ? (
+              <Button
+                onClick={handleLoanApplication}
+                variant="outline"
+                className="w-full border-gray-400 text-gray-600 hover:bg-gray-50"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Application Submitted
+              </Button>
+            ) : (
+              <Button
+                onClick={handleLoanApplication}
+                variant="outline"
+                className="w-full border-grass-500 text-grass-600 hover:bg-grass-50"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Apply for Loan
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

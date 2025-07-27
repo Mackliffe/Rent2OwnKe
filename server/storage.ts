@@ -106,21 +106,20 @@ export class DatabaseStorage implements IStorage {
 
   // Property Applications methods
   async getUserApplications(userId: string): Promise<PropertyApplication[]> {
-    return await db
+    const results = await db
       .select({
-        id: propertyApplications.id,
-        userId: propertyApplications.userId,
-        propertyId: propertyApplications.propertyId,
-        status: propertyApplications.status,
-        appliedAt: propertyApplications.appliedAt,
-        updatedAt: propertyApplications.updatedAt,
-        applicationData: propertyApplications.applicationData,
+        application: propertyApplications,
         property: properties,
       })
       .from(propertyApplications)
       .leftJoin(properties, eq(propertyApplications.propertyId, properties.id))
       .where(eq(propertyApplications.userId, userId))
       .orderBy(propertyApplications.appliedAt);
+    
+    return results.map(result => ({
+      ...result.application,
+      property: result.property,
+    })) as PropertyApplication[];
   }
 
   async getPropertyApplication(userId: string, propertyId: number): Promise<PropertyApplication | undefined> {

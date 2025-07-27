@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatKES } from "@/lib/currency";
-import { Calendar, MapPin, Home, FileText, CreditCard, Clock } from "lucide-react";
+import { Calendar, MapPin, Home, FileText, CreditCard, Clock, CheckCircle } from "lucide-react";
 import type { PropertyApplication } from "@shared/schema";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";

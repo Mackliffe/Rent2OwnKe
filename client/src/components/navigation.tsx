@@ -44,6 +44,11 @@ export default function Navigation() {
                 API Settings
               </Button>
             </Link>
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                My Dashboard
+              </Button>
+            </Link>
             <Link href="/signin">
               <Button variant="ghost" className="text-green-600 hover:text-green-700">
                 Sign In

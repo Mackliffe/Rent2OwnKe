@@ -7,17 +7,36 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Bed, Bath, Maximize, Car, MapPin, TreePine, Phone, Calculator as CalculatorIcon } from "lucide-react";
+import { Bed, Bath, Maximize, Car, MapPin, TreePine, Phone, Calculator as CalculatorIcon, CreditCard, CheckCircle } from "lucide-react";
 import { formatKES } from "@/lib/currency";
+import { useAuth } from "@/hooks/useAuth";
 import type { Property } from "@shared/schema";
 
 export default function PropertyDetails() {
   const { id } = useParams<{ id: string }>();
+  const { isAuthenticated } = useAuth();
 
   const { data: property, isLoading, error } = useQuery<Property>({
     queryKey: [`/api/properties/${id}`],
     enabled: !!id,
   });
+
+  // Check if user has already applied for this property
+  const { data: applicationStatus } = useQuery({
+    queryKey: [`/api/applications/check/${id}`],
+    enabled: !!id && isAuthenticated,
+    retry: false,
+  });
+
+  const handleLoanApplication = () => {
+    if (!isAuthenticated) {
+      window.location.href = "/api/login";
+    } else if (applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) {
+      window.location.href = "/dashboard";
+    } else {
+      window.location.href = `/loan-application/${id}`;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -89,7 +108,7 @@ export default function PropertyDetails() {
           {/* Room Viewer */}
           <div>
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Interior Views</h2>
-            <RoomViewer rooms={property.rooms} />
+            <RoomViewer rooms={property.rooms || []} />
           </div>
           
           {/* Property Details */}
@@ -142,11 +161,11 @@ export default function PropertyDetails() {
                   <p className="text-gray-600">{property.description}</p>
                 </div>
 
-                {property.amenities.length > 0 && (
+                {property.amenities && property.amenities.length > 0 && (
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2">Amenities</h4>
                     <div className="flex flex-wrap gap-2">
-                      {property.amenities.map((amenity, index) => (
+                      {(property.amenities || []).map((amenity, index) => (
                         <Badge key={index} variant="outline">{amenity}</Badge>
                       ))}
                     </div>
@@ -170,9 +189,9 @@ export default function PropertyDetails() {
                     <span className="font-semibold">{formatKES(property.price)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Down Payment ({property.downPaymentPercent}%)</span>
+                    <span className="text-gray-600">Down Payment ({property.downPaymentPercent || 10}%)</span>
                     <span className="font-semibold text-grass-600">
-                      {formatKES(property.price * (property.downPaymentPercent / 100))}
+                      {formatKES(property.price * ((property.downPaymentPercent || 10) / 100))}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -190,7 +209,35 @@ export default function PropertyDetails() {
                 </div>
                 
                 <div className="mt-6 space-y-3">
-                  <Button className="w-full grass-500 hover:bg-grass-600">
+                  {/* Loan Application Button */}
+                  {!isAuthenticated ? (
+                    <Button
+                      onClick={handleLoanApplication}
+                      className="w-full bg-grass-500 hover:bg-grass-600 text-white"
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Sign In to Apply for Loan
+                    </Button>
+                  ) : (applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) ? (
+                    <Button
+                      onClick={handleLoanApplication}
+                      variant="outline"
+                      className="w-full border-gray-400 text-gray-600 hover:bg-gray-50"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Application Submitted - View Status
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleLoanApplication}
+                      className="w-full bg-grass-500 hover:bg-grass-600 text-white"
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Apply for Rent-to-Own Loan
+                    </Button>
+                  )}
+                  
+                  <Button variant="outline" className="w-full">
                     <Phone className="mr-2 h-4 w-4" />
                     Contact Agent
                   </Button>
