@@ -161,6 +161,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Applications endpoints
+  app.get("/api/applications", async (req: any, res) => {
+    try {
+      if (!req.user?.claims?.sub) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const applications = await storage.getUserApplications(req.user.claims.sub);
+      res.json(applications);
+    } catch (error) {
+      console.error("Error getting applications:", error);
+      res.status(500).json({ message: "Failed to fetch applications" });
+    }
+  });
+
+  app.post("/api/applications", async (req: any, res) => {
+    try {
+      if (!req.user?.claims?.sub) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const { propertyId, applicationData } = req.body;
+      
+      // Check if user already applied for this property
+      const existingApplication = await storage.getPropertyApplication(req.user.claims.sub, propertyId);
+      if (existingApplication) {
+        return res.status(400).json({ message: "You have already applied for this property" });
+      }
+
+      const application = await storage.createPropertyApplication({
+        userId: req.user.claims.sub,
+        propertyId: parseInt(propertyId),
+        applicationData,
+        status: "pending",
+      });
+
+      res.json(application);
+    } catch (error) {
+      console.error("Error creating application:", error);
+      res.status(500).json({ message: "Failed to create application" });
+    }
+  });
+
+  app.get("/api/applications/check/:propertyId", async (req: any, res) => {
+    try {
+      if (!req.user?.claims?.sub) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const application = await storage.getPropertyApplication(
+        req.user.claims.sub, 
+        parseInt(req.params.propertyId)
+      );
+      
+      res.json({ hasApplied: !!application, application });
+    } catch (error) {
+      console.error("Error checking application:", error);
+      res.status(500).json({ message: "Failed to check application" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

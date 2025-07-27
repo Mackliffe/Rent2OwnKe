@@ -113,14 +113,48 @@ export default function LoanApplication() {
     }
 
     try {
-      // In a real application, this would submit to the backend
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          propertyId,
+          applicationData: formData,
+        }),
+      });
+
+      if (response.status === 401) {
+        toast({
+          title: "Unauthorized",
+          description: "Please sign in to submit your application.",
+          variant: "destructive",
+        });
+        window.location.href = "/api/login";
+        return;
+      }
+
+      if (response.status === 400) {
+        toast({
+          title: "Already Applied",
+          description: "You have already applied for this property.",
+          variant: "destructive",
+        });
+        window.location.href = "/dashboard";
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to submit application");
+      }
+
       toast({
         title: "Application Submitted Successfully",
         description: "Your loan application has been received. We'll contact you within 2-3 business days.",
       });
       
-      // Redirect to success page or property details
-      window.location.href = `/property/${propertyId}`;
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
     } catch (error) {
       toast({
         title: "Submission Failed",

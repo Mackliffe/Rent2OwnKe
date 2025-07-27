@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Calculator, Info } from "lucide-react";
+import { Calculator, Info, CheckCircle } from "lucide-react";
 import { formatKES } from "@/lib/currency";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import type { CalculatorParams, CalculatorResult } from "@shared/schema";
 
 interface RentCalculatorProps {
@@ -18,6 +19,7 @@ interface RentCalculatorProps {
 }
 
 export default function RentCalculator({ initialValue = 8500000, className = "", propertyId }: RentCalculatorProps) {
+  const { isAuthenticated } = useAuth();
   const [params, setParams] = useState<CalculatorParams>({
     propertyValue: initialValue,
     downPaymentPercent: 10,
@@ -26,6 +28,13 @@ export default function RentCalculator({ initialValue = 8500000, className = "",
   });
 
   const [result, setResult] = useState<CalculatorResult | null>(null);
+
+  // Check if user has already applied for this property
+  const { data: applicationStatus } = useQuery({
+    queryKey: [`/api/applications/check/${propertyId}`],
+    enabled: !!propertyId && isAuthenticated,
+    retry: false,
+  });
 
   const calculateMutation = useMutation({
     mutationFn: async (calculatorParams: CalculatorParams) => {
@@ -217,18 +226,53 @@ export default function RentCalculator({ initialValue = 8500000, className = "",
           </div>
           
           {/* Loan Application Button */}
-          {result && (
+          {result && propertyId && (
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <Button
-                onClick={() => window.location.href = `/loan-application/${propertyId}`}
-                className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3"
-                size="lg"
-              >
-                Apply for Rent-to-Own Loan
-              </Button>
-              <p className="text-sm text-gray-600 text-center mt-2">
-                Start your application to get pre-approved for this property
-              </p>
+              {!isAuthenticated ? (
+                <div className="text-center">
+                  <Button
+                    onClick={() => window.location.href = "/api/login"}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3"
+                    size="lg"
+                  >
+                    Sign In to Apply for Loan
+                  </Button>
+                  <p className="text-sm text-gray-600 mt-2">
+                    You need to be signed in to apply for rent-to-own loans
+                  </p>
+                </div>
+              ) : applicationStatus?.hasApplied ? (
+                <div className="text-center">
+                  <Button
+                    disabled
+                    className="w-full bg-gray-400 text-white text-lg py-3 cursor-not-allowed"
+                    size="lg"
+                  >
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    Application Submitted
+                  </Button>
+                  <p className="text-sm text-gray-600 mt-2">
+                    You have already applied for this property. Check your{" "}
+                    <a href="/dashboard" className="text-green-600 hover:underline">
+                      dashboard
+                    </a>{" "}
+                    for status updates.
+                  </p>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Button
+                    onClick={() => window.location.href = `/loan-application/${propertyId}`}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3"
+                    size="lg"
+                  >
+                    Apply for Rent-to-Own Loan
+                  </Button>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Start your application to get pre-approved for this property
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </CardContent>

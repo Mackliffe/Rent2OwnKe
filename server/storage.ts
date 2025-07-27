@@ -1,4 +1,4 @@
-import { properties, locations, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom } from "@shared/schema";
+import { properties, locations, propertyApplications, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom, type PropertyApplication, type InsertPropertyApplication } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte } from "drizzle-orm";
 
@@ -15,6 +15,12 @@ export interface IStorage {
   // Locations
   getLocations(): Promise<Location[]>;
   getLocationsByCity(city: string): Promise<Location[]>;
+  
+  // Property Applications
+  getUserApplications(userId: string): Promise<PropertyApplication[]>;
+  getPropertyApplication(userId: string, propertyId: number): Promise<PropertyApplication | undefined>;
+  createPropertyApplication(application: InsertPropertyApplication): Promise<PropertyApplication>;
+  updateApplicationStatus(id: number, status: string): Promise<PropertyApplication>;
 }
 
 export type PropertySearchFilters = {
@@ -96,6 +102,53 @@ export class DatabaseStorage implements IStorage {
 
   async getLocationsByCity(city: string): Promise<Location[]> {
     return await db.select().from(locations).where(eq(locations.city, city));
+  }
+
+  // Property Applications methods
+  async getUserApplications(userId: string): Promise<PropertyApplication[]> {
+    return await db
+      .select({
+        id: propertyApplications.id,
+        userId: propertyApplications.userId,
+        propertyId: propertyApplications.propertyId,
+        status: propertyApplications.status,
+        appliedAt: propertyApplications.appliedAt,
+        updatedAt: propertyApplications.updatedAt,
+        applicationData: propertyApplications.applicationData,
+        property: properties,
+      })
+      .from(propertyApplications)
+      .leftJoin(properties, eq(propertyApplications.propertyId, properties.id))
+      .where(eq(propertyApplications.userId, userId))
+      .orderBy(propertyApplications.appliedAt);
+  }
+
+  async getPropertyApplication(userId: string, propertyId: number): Promise<PropertyApplication | undefined> {
+    const [application] = await db
+      .select()
+      .from(propertyApplications)
+      .where(and(
+        eq(propertyApplications.userId, userId),
+        eq(propertyApplications.propertyId, propertyId)
+      ));
+    return application || undefined;
+  }
+
+  async createPropertyApplication(application: InsertPropertyApplication): Promise<PropertyApplication> {
+    const [newApplication] = await db
+      .insert(propertyApplications)
+      .values(application)
+      .returning();
+    return newApplication;
+  }
+
+  async updateApplicationStatus(id: number, status: string): Promise<PropertyApplication> {
+    const [updated] = await db
+      .update(propertyApplications)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(propertyApplications.id, id))
+      .returning();
+    return updated;
   }
 }
 
@@ -347,6 +400,23 @@ export class MemStorage implements IStorage {
     return Array.from(this.locations.values()).filter(l => 
       l.city.toLowerCase() === city.toLowerCase()
     );
+  }
+
+  // Property Applications methods - stub implementation for MemStorage
+  async getUserApplications(userId: string): Promise<PropertyApplication[]> {
+    return [];
+  }
+
+  async getPropertyApplication(userId: string, propertyId: number): Promise<PropertyApplication | undefined> {
+    return undefined;
+  }
+
+  async createPropertyApplication(application: InsertPropertyApplication): Promise<PropertyApplication> {
+    throw new Error("Property applications not supported in memory storage");
+  }
+
+  async updateApplicationStatus(id: number, status: string): Promise<PropertyApplication> {
+    throw new Error("Property applications not supported in memory storage");
   }
 }
 

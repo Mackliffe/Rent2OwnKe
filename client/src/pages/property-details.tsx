@@ -206,7 +206,7 @@ export default function PropertyDetails() {
         {/* Full Calculator */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Calculate Your Payment Plan</h2>
-          <RentCalculator initialValue={property.price} propertyId={params?.id} />
+          <RentCalculator initialValue={property.price} propertyId={id} />
         </div>
       </div>
     </div>

@@ -33,6 +33,8 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
 - **Properties Table**: Core property data including pricing, location, features, and rent-to-own calculations
 - **Locations Table**: Kenyan geographical data (counties, cities, neighborhoods)
 - **Property Rooms**: JSON-based room data with images and descriptions
+- **Users Table**: User authentication and profile data for Replit Auth integration
+- **Property Applications Table**: User loan applications with status tracking and KYC data storage
 
 ### Frontend Components
 - **Navigation**: Responsive navigation with mobile support
@@ -120,6 +122,15 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
   - Built form validation and progress tracking system
   - Added Kenyan-specific fields: KRA PIN, county selection, banking partners
   - Created comprehensive consent system compliant with Kenyan banking regulations
+
+- January 27, 2025: Property Application Tracking & User Dashboard
+  - Built complete property application tracking system
+  - Added user authentication integration with property applications
+  - Created dashboard page showing user's applied properties and status
+  - Implemented application status tracking (pending, processing, approved, rejected)
+  - Added duplicate application prevention (one application per property per user)
+  - Enhanced loan application button with authentication and status checks
+  - Added "My Dashboard" navigation for signed-in users to view their applications
 
 ## Changelog
 - June 28, 2025: Initial setup

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, decimal, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, decimal, boolean, jsonb, timestamp, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -93,3 +93,41 @@ export type PaymentScheduleItem = {
   monthlyPayment: number;
   description: string;
 };
+
+// User table for authentication
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Property Applications table for tracking user applications
+export const propertyApplications = pgTable("property_applications", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  propertyId: integer("property_id").notNull().references(() => properties.id),
+  status: varchar("status").notNull().default("pending"), // pending, approved, rejected, processing
+  appliedAt: timestamp("applied_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  applicationData: jsonb("application_data"), // Store the form data
+});
+
+export const propertyApplicationsRelations = relations(propertyApplications, ({ one }) => ({
+  user: one(users, {
+    fields: [propertyApplications.userId],
+    references: [users.id],
+  }),
+  property: one(properties, {
+    fields: [propertyApplications.propertyId],
+    references: [properties.id],
+  }),
+}));
+
+export type User = typeof users.$inferSelect;
+export type UpsertUser = typeof users.$inferInsert;
+export type PropertyApplication = typeof propertyApplications.$inferSelect;
+export type InsertPropertyApplication = typeof propertyApplications.$inferInsert;
