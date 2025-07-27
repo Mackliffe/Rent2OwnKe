@@ -223,7 +223,7 @@ export default function PropertyDetails() {
                       className="w-full bg-grass-500 hover:bg-grass-600 text-white"
                     >
                       <CreditCard className="w-4 h-4 mr-2" />
-                      Apply for Rent-to-Own Loan
+                      Apply for Rent to Own
                     </Button>
                   )}
                   

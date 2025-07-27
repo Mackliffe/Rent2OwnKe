@@ -228,20 +228,7 @@ export default function RentCalculator({ initialValue = 8500000, className = "",
           {/* Loan Application Button */}
           {result && propertyId && (
             <div className="mt-6 pt-6 border-t border-gray-200">
-              {!isAuthenticated ? (
-                <div className="text-center">
-                  <Button
-                    onClick={() => window.location.href = "/api/login"}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3"
-                    size="lg"
-                  >
-                    Sign In to Apply for Loan
-                  </Button>
-                  <p className="text-sm text-gray-600 mt-2">
-                    You need to be signed in to apply for rent-to-own loans
-                  </p>
-                </div>
-              ) : applicationStatus?.hasApplied ? (
+              {(isAuthenticated && applicationStatus?.hasApplied) ? (
                 <div className="text-center">
                   <Button
                     disabled
@@ -266,7 +253,7 @@ export default function RentCalculator({ initialValue = 8500000, className = "",
                     className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3"
                     size="lg"
                   >
-                    Apply for Rent-to-Own Loan
+                    Apply for Rent to Own
                   </Button>
                   <p className="text-sm text-gray-600 mt-2">
                     Start your application to get pre-approved for this property

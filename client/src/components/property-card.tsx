@@ -2,10 +2,8 @@ import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bed, Bath, Maximize, MapPin, Car, Star, CheckCircle, CreditCard } from "lucide-react";
+import { Bed, Bath, Maximize, MapPin, Car, Star } from "lucide-react";
 import { formatKES } from "@/lib/currency";
-import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
 import type { Property } from "@shared/schema";
 
 interface PropertyCardProps {
@@ -13,15 +11,6 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property }: PropertyCardProps) {
-  const { isAuthenticated } = useAuth();
-
-  // Check if user has already applied for this property
-  const { data: applicationStatus } = useQuery({
-    queryKey: [`/api/applications/check/${property.id}`],
-    enabled: !!property.id && isAuthenticated,
-    retry: false,
-  });
-
   const getPropertyTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
       case 'apartment':
@@ -32,14 +21,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const handleLoanApplication = () => {
-    if (isAuthenticated && applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) {
-      window.location.href = "/dashboard";
-    } else {
-      window.location.href = `/loan-application/${property.id}`;
     }
   };
 
@@ -103,30 +84,9 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           <div className="space-y-2">
             <Link href={`/property/${property.id}`}>
               <Button className="w-full bg-grass-500 hover:bg-grass-600 text-white">
-                View Details
+                View More
               </Button>
             </Link>
-            
-            {/* Loan Application Button */}
-            {(isAuthenticated && applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) ? (
-              <Button
-                onClick={handleLoanApplication}
-                variant="outline"
-                className="w-full border-gray-400 text-gray-600 hover:bg-gray-50"
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Application Submitted
-              </Button>
-            ) : (
-              <Button
-                onClick={handleLoanApplication}
-                variant="outline"
-                className="w-full border-grass-500 text-grass-600 hover:bg-grass-50"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Apply for Loan
-              </Button>
-            )}
           </div>
         </div>
       </CardContent>
