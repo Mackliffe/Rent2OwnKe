@@ -130,20 +130,37 @@ export default function LoanApplication() {
 
       const result = await response.json();
 
-      if (response.status === 401) {
-        if (result.requiresLogin) {
+      // Handle successful submission (201) or existing user application (201 with login required)
+      if (response.status === 201) {
+        if (result.hasAccount && result.requiresLogin) {
           toast({
-            title: "Account Found",
-            description: "We found your account. Please sign in to continue with your application.",
+            title: "Application Submitted!",
+            description: "Your application was submitted successfully. Please sign in to track your application status.",
           });
-          // Store application data for after login
-          sessionStorage.setItem('pendingApplication', JSON.stringify({ propertyId, applicationData: formData }));
-          window.location.href = "/api/login";
+          // Store success message and redirect to login
+          setTimeout(() => {
+            window.location.href = "/api/login";
+          }, 2000);
           return;
-        } else if (result.requiresSignup) {
+        } else {
+          toast({
+            title: "Application Submitted Successfully",
+            description: result.message || "Your loan application has been received. We'll contact you within 2-3 business days.",
+          });
+          // Clear any pending application data
+          sessionStorage.removeItem('pendingApplication');
+          // Redirect to dashboard
+          window.location.href = "/dashboard";
+          return;
+        }
+      }
+
+      // Handle new user requiring signup (202)
+      if (response.status === 202) {
+        if (result.requiresSignup) {
           toast({
             title: "Create Your Account",
-            description: "Please sign in to create your account and submit your application.",
+            description: "Please sign in to create your account and complete your application.",
           });
           // Store application data for after signup
           sessionStorage.setItem('pendingApplication', JSON.stringify({ propertyId, applicationData: formData }));
@@ -153,29 +170,28 @@ export default function LoanApplication() {
       }
 
       if (response.status === 400) {
-        toast({
-          title: "Already Applied",
-          description: "You have already applied for this property.",
-          variant: "destructive",
-        });
-        window.location.href = "/dashboard";
-        return;
+        if (result.hasAccount && result.requiresLogin) {
+          toast({
+            title: "Already Applied",
+            description: "You have already applied for this property. Please sign in to view your application status.",
+            variant: "destructive",
+          });
+          window.location.href = "/api/login";
+          return;
+        } else {
+          toast({
+            title: "Already Applied",
+            description: "You have already applied for this property.",
+            variant: "destructive",
+          });
+          window.location.href = "/dashboard";
+          return;
+        }
       }
 
       if (!response.ok) {
         throw new Error(result.message || "Failed to submit application");
       }
-
-      toast({
-        title: "Application Submitted Successfully",
-        description: result.message || "Your loan application has been received. We'll contact you within 2-3 business days.",
-      });
-      
-      // Clear any pending application data
-      sessionStorage.removeItem('pendingApplication');
-      
-      // Redirect to dashboard
-      window.location.href = "/dashboard";
     } catch (error) {
       toast({
         title: "Submission Failed",

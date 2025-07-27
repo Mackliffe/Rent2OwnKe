@@ -165,14 +165,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/applications/auto-auth", async (req, res) => {
     try {
       const { propertyId, applicationData } = req.body;
-      const { email, fullName } = applicationData;
+      const { email, fullName, phoneNumber } = applicationData;
 
       if (!email || !fullName) {
         return res.status(400).json({ message: "Email and full name are required" });
       }
 
       // Check if user is already authenticated
-      if (req.isAuthenticated()) {
+      const isAuthenticated = req.user && (req as any).isAuthenticated && (req as any).isAuthenticated();
+      if (isAuthenticated) {
         const userId = (req.user as any)?.claims?.sub;
         
         // Check for existing application
@@ -196,23 +197,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // User not authenticated - check if account exists
+      // User not authenticated - check if account exists by email or phone
       const existingUser = await storage.getUserByEmail(email);
       
       if (existingUser) {
-        // User exists but not logged in - redirect to login
-        return res.status(401).json({ 
-          message: "Account exists, please sign in to continue",
-          requiresLogin: true,
-          email: email
+        // User exists - create application and associate with user
+        const existingApplication = await storage.getUserApplicationByProperty(existingUser.id, propertyId);
+        if (existingApplication) {
+          return res.status(400).json({ 
+            message: "You have already applied for this property",
+            hasAccount: true,
+            requiresLogin: true 
+          });
+        }
+
+        // Create the application for existing user
+        const application = await storage.createApplication({
+          userId: existingUser.id,
+          propertyId: parseInt(propertyId),
+          applicationData,
+          status: "pending",
+        });
+
+        return res.status(201).json({ 
+          success: true, 
+          application,
+          message: "Application submitted successfully! Please sign in to track your application status.",
+          hasAccount: true,
+          requiresLogin: true
         });
       }
 
-      // For new users, redirect to login to create account through OAuth
-      return res.status(401).json({ 
-        message: "Please sign in to create your account and submit application",
+      // New user - prompt for password to create account
+      return res.status(202).json({ 
+        message: "New user detected. Please set a password to create your account.",
         requiresSignup: true,
-        email: email
+        email: email,
+        phoneNumber: phoneNumber
       });
 
     } catch (error) {
