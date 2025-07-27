@@ -29,9 +29,7 @@ export default function PropertyDetails() {
   });
 
   const handleLoanApplication = () => {
-    if (!isAuthenticated) {
-      window.location.href = "/api/login";
-    } else if (applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) {
+    if (isAuthenticated && applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) {
       window.location.href = "/dashboard";
     } else {
       window.location.href = `/loan-application/${id}`;
@@ -210,15 +208,7 @@ export default function PropertyDetails() {
                 
                 <div className="mt-6 space-y-3">
                   {/* Loan Application Button */}
-                  {!isAuthenticated ? (
-                    <Button
-                      onClick={handleLoanApplication}
-                      className="w-full bg-grass-500 hover:bg-grass-600 text-white"
-                    >
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Sign In to Apply for Loan
-                    </Button>
-                  ) : (applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) ? (
+                  {(isAuthenticated && applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) ? (
                     <Button
                       onClick={handleLoanApplication}
                       variant="outline"

@@ -161,6 +161,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Auto-authenticate and submit application
+  app.post("/api/applications/auto-auth", async (req, res) => {
+    try {
+      const { propertyId, applicationData } = req.body;
+      const { email, fullName } = applicationData;
+
+      if (!email || !fullName) {
+        return res.status(400).json({ message: "Email and full name are required" });
+      }
+
+      // Check if user is already authenticated
+      if (req.isAuthenticated()) {
+        const userId = (req.user as any)?.claims?.sub;
+        
+        // Check for existing application
+        const existingApplication = await storage.getUserApplicationByProperty(userId, propertyId);
+        if (existingApplication) {
+          return res.status(400).json({ message: "Application already exists" });
+        }
+
+        // Create the application
+        const application = await storage.createApplication({
+          userId,
+          propertyId: parseInt(propertyId),
+          applicationData,
+          status: "pending",
+        });
+
+        return res.status(201).json({ 
+          success: true, 
+          application,
+          message: "Application submitted successfully"
+        });
+      }
+
+      // User not authenticated - check if account exists
+      const existingUser = await storage.getUserByEmail(email);
+      
+      if (existingUser) {
+        // User exists but not logged in - redirect to login
+        return res.status(401).json({ 
+          message: "Account exists, please sign in to continue",
+          requiresLogin: true,
+          email: email
+        });
+      }
+
+      // For new users, redirect to login to create account through OAuth
+      return res.status(401).json({ 
+        message: "Please sign in to create your account and submit application",
+        requiresSignup: true,
+        email: email
+      });
+
+    } catch (error) {
+      console.error("Auto-auth application error:", error);
+      res.status(500).json({ message: "Failed to process application" });
+    }
+  });
+
   // Property Applications endpoints
   app.get("/api/applications", async (req: any, res) => {
     try {
@@ -190,14 +250,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "You have already applied for this property" });
       }
 
-      const application = await storage.createPropertyApplication({
+      const application = await storage.createApplication({
         userId: req.user.claims.sub,
         propertyId: parseInt(propertyId),
         applicationData,
         status: "pending",
       });
 
-      res.json(application);
+      res.status(201).json({ 
+        success: true, 
+        application,
+        message: "Application submitted successfully"
+      });
     } catch (error) {
       console.error("Error creating application:", error);
       res.status(500).json({ message: "Failed to create application" });

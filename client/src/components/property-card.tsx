@@ -36,9 +36,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   };
 
   const handleLoanApplication = () => {
-    if (!isAuthenticated) {
-      window.location.href = "/api/login";
-    } else if (applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) {
+    if (isAuthenticated && applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) {
       window.location.href = "/dashboard";
     } else {
       window.location.href = `/loan-application/${property.id}`;
@@ -110,16 +108,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             </Link>
             
             {/* Loan Application Button */}
-            {!isAuthenticated ? (
-              <Button
-                onClick={handleLoanApplication}
-                variant="outline"
-                className="w-full border-grass-500 text-grass-600 hover:bg-grass-50"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Sign In to Apply
-              </Button>
-            ) : (applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) ? (
+            {(isAuthenticated && applicationStatus && 'hasApplied' in applicationStatus && applicationStatus.hasApplied) ? (
               <Button
                 onClick={handleLoanApplication}
                 variant="outline"

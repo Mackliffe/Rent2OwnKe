@@ -9,12 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { apiRequest } from "@/lib/queryClient";
 import { FileText, User, Briefcase, CreditCard, Shield, CheckCircle } from "lucide-react";
 
 export default function LoanApplication() {
   const [, params] = useRoute("/loan-application/:propertyId");
   const propertyId = params?.propertyId;
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   const [formData, setFormData] = useState({
     // Personal Information
@@ -113,7 +116,8 @@ export default function LoanApplication() {
     }
 
     try {
-      const response = await fetch("/api/applications", {
+      // Use auto-authentication endpoint
+      const response = await fetch("/api/applications/auto-auth", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,14 +128,28 @@ export default function LoanApplication() {
         }),
       });
 
+      const result = await response.json();
+
       if (response.status === 401) {
-        toast({
-          title: "Unauthorized",
-          description: "Please sign in to submit your application.",
-          variant: "destructive",
-        });
-        window.location.href = "/api/login";
-        return;
+        if (result.requiresLogin) {
+          toast({
+            title: "Account Found",
+            description: "We found your account. Please sign in to continue with your application.",
+          });
+          // Store application data for after login
+          sessionStorage.setItem('pendingApplication', JSON.stringify({ propertyId, applicationData: formData }));
+          window.location.href = "/api/login";
+          return;
+        } else if (result.requiresSignup) {
+          toast({
+            title: "Create Your Account",
+            description: "Please sign in to create your account and submit your application.",
+          });
+          // Store application data for after signup
+          sessionStorage.setItem('pendingApplication', JSON.stringify({ propertyId, applicationData: formData }));
+          window.location.href = "/api/login";
+          return;
+        }
       }
 
       if (response.status === 400) {
@@ -145,13 +163,16 @@ export default function LoanApplication() {
       }
 
       if (!response.ok) {
-        throw new Error("Failed to submit application");
+        throw new Error(result.message || "Failed to submit application");
       }
 
       toast({
         title: "Application Submitted Successfully",
-        description: "Your loan application has been received. We'll contact you within 2-3 business days.",
+        description: result.message || "Your loan application has been received. We'll contact you within 2-3 business days.",
       });
+      
+      // Clear any pending application data
+      sessionStorage.removeItem('pendingApplication');
       
       // Redirect to dashboard
       window.location.href = "/dashboard";

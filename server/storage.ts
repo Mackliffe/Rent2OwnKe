@@ -104,6 +104,12 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(locations).where(eq(locations.city, city));
   }
 
+  // Additional user methods
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
   // Property Applications methods
   async getUserApplications(userId: string): Promise<PropertyApplication[]> {
     const results = await db
@@ -131,6 +137,14 @@ export class DatabaseStorage implements IStorage {
         eq(propertyApplications.propertyId, propertyId)
       ));
     return application || undefined;
+  }
+
+  async getUserApplicationByProperty(userId: string, propertyId: number): Promise<PropertyApplication | undefined> {
+    return this.getPropertyApplication(userId, propertyId);
+  }
+
+  async createApplication(application: InsertPropertyApplication): Promise<PropertyApplication> {
+    return this.createPropertyApplication(application);
   }
 
   async createPropertyApplication(application: InsertPropertyApplication): Promise<PropertyApplication> {
