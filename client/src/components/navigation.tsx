@@ -1,9 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { Home, Calculator, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navigation() {
   const [location] = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -39,26 +41,41 @@ export default function Navigation() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <Link href="/api-settings">
-              <Button variant="ghost" className="text-green-600 hover:text-green-700">
-                API Settings
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button variant="ghost" className="text-green-600 hover:text-green-700">
-                My Dashboard
-              </Button>
-            </Link>
-            <Link href="/signin">
-              <Button variant="ghost" className="text-green-600 hover:text-green-700">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-green-600 hover:bg-green-700 text-white">
-                Get Started
-              </Button>
-            </Link>
+            {!isLoading && isAuthenticated && (
+              <>
+                <Link href="/api-settings">
+                  <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                    API Settings
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                    My Dashboard
+                  </Button>
+                </Link>
+              </>
+            )}
+            {!isLoading && !isAuthenticated && (
+              <>
+                <Link href="/signin">
+                  <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
+            {!isLoading && isAuthenticated && (
+              <Link href="/api/logout">
+                <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                  Sign Out
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>
