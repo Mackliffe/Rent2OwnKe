@@ -14,9 +14,10 @@ import type { CalculatorParams, CalculatorResult } from "@shared/schema";
 interface RentCalculatorProps {
   initialValue?: number;
   className?: string;
+  propertyId?: string;
 }
 
-export default function RentCalculator({ initialValue = 8500000, className = "" }: RentCalculatorProps) {
+export default function RentCalculator({ initialValue = 8500000, className = "", propertyId }: RentCalculatorProps) {
   const [params, setParams] = useState<CalculatorParams>({
     propertyValue: initialValue,
     downPaymentPercent: 10,
@@ -214,6 +215,22 @@ export default function RentCalculator({ initialValue = 8500000, className = "" 
               )}
             </div>
           </div>
+          
+          {/* Loan Application Button */}
+          {result && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <Button
+                onClick={() => window.location.href = `/loan-application/${propertyId}`}
+                className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-3"
+                size="lg"
+              >
+                Apply for Rent-to-Own Loan
+              </Button>
+              <p className="text-sm text-gray-600 text-center mt-2">
+                Start your application to get pre-approved for this property
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
