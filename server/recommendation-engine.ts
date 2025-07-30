@@ -157,7 +157,7 @@ export class RecommendationEngine {
 
     // Location preference (25%)
     maxScore += 25;
-    if (preferences.preferredLocations.length > 0) {
+    if (preferences.preferredLocations && preferences.preferredLocations.length > 0) {
       if (preferences.preferredLocations.includes(property.location.toLowerCase())) {
         score += 25;
       }
@@ -167,7 +167,7 @@ export class RecommendationEngine {
 
     // Property type preference (20%)
     maxScore += 20;
-    if (preferences.propertyTypes.length > 0) {
+    if (preferences.propertyTypes && preferences.propertyTypes.length > 0) {
       if (preferences.propertyTypes.includes(property.propertyType.toLowerCase())) {
         score += 20;
       }
@@ -205,10 +205,10 @@ export class RecommendationEngine {
 
     // Previous interactions (10%)
     maxScore += 10;
-    if (preferences.viewedProperties.includes(property.id)) {
+    if (preferences.viewedProperties && preferences.viewedProperties.includes(property.id)) {
       score += 5; // Previously viewed
     }
-    if (preferences.savedProperties.includes(property.id)) {
+    if (preferences.savedProperties && preferences.savedProperties.includes(property.id)) {
       score += 10; // Previously saved
     }
 
@@ -325,12 +325,12 @@ export class RecommendationEngine {
     const reasons: string[] = [];
 
     // Location match
-    if (preferences.preferredLocations.includes(property.location.toLowerCase())) {
+    if (preferences.preferredLocations && preferences.preferredLocations.includes(property.location.toLowerCase())) {
       reasons.push(`Located in your preferred area: ${property.location}`);
     }
 
     // Property type match
-    if (preferences.propertyTypes.includes(property.propertyType.toLowerCase())) {
+    if (preferences.propertyTypes && preferences.propertyTypes.includes(property.propertyType.toLowerCase())) {
       reasons.push(`Matches your preferred property type: ${property.propertyType}`);
     }
 
@@ -358,7 +358,7 @@ export class RecommendationEngine {
     }
 
     // Previous interest
-    if (preferences.viewedProperties.includes(property.id)) {
+    if (preferences.viewedProperties && preferences.viewedProperties.includes(property.id)) {
       reasons.push("You previously viewed this property");
     }
 
@@ -397,7 +397,7 @@ export class RecommendationEngine {
     }
 
     // Lifestyle insights
-    if (preferences.lifestyleFactors.includes("family-friendly") && property.bedrooms >= 3) {
+    if (preferences.lifestyleFactors && preferences.lifestyleFactors.includes("family-friendly") && property.bedrooms >= 3) {
       insights.push({
         category: "Lifestyle",
         insight: "Spacious layout ideal for family living with room for growth",
@@ -427,9 +427,9 @@ export class RecommendationEngine {
     let note = `This ${property.propertyType.toLowerCase()} in ${property.location}`;
     
     // Add specific appeal based on preferences
-    if (preferences.investmentGoals.includes("first-home")) {
+    if (preferences.investmentGoals && preferences.investmentGoals.includes("first-home")) {
       note += " could be an excellent first home choice";
-    } else if (preferences.investmentGoals.includes("investment")) {
+    } else if (preferences.investmentGoals && preferences.investmentGoals.includes("investment")) {
       note += " offers strong investment potential";
     } else {
       note += " aligns well with your search criteria";
@@ -452,11 +452,11 @@ export class RecommendationEngine {
     
     // Higher confidence with more complete preferences
     const preferenceCompleteness = [
-      preferences.preferredLocations.length > 0,
-      preferences.propertyTypes.length > 0,
+      preferences.preferredLocations && preferences.preferredLocations.length > 0,
+      preferences.propertyTypes && preferences.propertyTypes.length > 0,
       preferences.budgetMax !== undefined,
       preferences.bedroomPreference !== undefined,
-      preferences.lifestyleFactors.length > 0
+      preferences.lifestyleFactors && preferences.lifestyleFactors.length > 0
     ].filter(Boolean).length / 5;
     
     confidence += preferenceCompleteness * 0.3;

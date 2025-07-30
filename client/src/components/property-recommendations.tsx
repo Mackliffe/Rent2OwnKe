@@ -50,6 +50,9 @@ interface UserPreferences {
   lifestyleFactors: string[];
   investmentGoals: string[];
   riskTolerance: "low" | "moderate" | "high";
+  searchHistory: string[];
+  viewedProperties: number[];
+  savedProperties: number[];
 }
 
 export default function PropertyRecommendations() {
@@ -61,7 +64,10 @@ export default function PropertyRecommendations() {
     bedroomPreference: 3,
     lifestyleFactors: ["family-friendly"],
     investmentGoals: ["first-home"],
-    riskTolerance: "moderate"
+    riskTolerance: "moderate",
+    searchHistory: [],
+    viewedProperties: [],
+    savedProperties: []
   });
   const [showPreferences, setShowPreferences] = useState(false);
 

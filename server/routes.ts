@@ -172,9 +172,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user is already authenticated
-      const isAuthenticated = req.user && (req as any).isAuthenticated && (req as any).isAuthenticated();
+      const reqUser = req as any;
+      const isAuthenticated = reqUser.user && reqUser.isAuthenticated && reqUser.isAuthenticated();
       if (isAuthenticated) {
-        const userId = (req.user as any)?.claims?.sub;
+        const userId = reqUser.user?.claims?.sub;
         
         // Check for existing application
         const existingApplication = await storage.getUserApplicationByProperty(userId, propertyId);
@@ -328,10 +329,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all properties
       const properties = await storage.getProperties();
       
-      // Generate recommendations
+      // Generate recommendations with proper defaults
+      const userPreferences = {
+        userId: "demo-user",
+        preferredLocations: preferences.preferredLocations || [],
+        propertyTypes: preferences.propertyTypes || [],
+        budgetMin: preferences.budgetMin,
+        budgetMax: preferences.budgetMax,
+        bedroomPreference: preferences.bedroomPreference,
+        lifestyleFactors: preferences.lifestyleFactors || [],
+        investmentGoals: preferences.investmentGoals || [],
+        riskTolerance: preferences.riskTolerance || "moderate",
+        searchHistory: [],
+        viewedProperties: [],
+        savedProperties: [],
+        lastUpdated: new Date()
+      };
+      
       const recommendations = recommendationEngine.generateRecommendations(
         properties,
-        { ...preferences, userId: "demo-user" }
+        userPreferences
       );
       
       // Attach property details to recommendations
