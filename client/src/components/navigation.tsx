@@ -32,6 +32,12 @@ export default function Navigation() {
             >
               Calculator
             </Link>
+            <Link 
+              href="/risk-calculator" 
+              className={`font-medium ${location === '/risk-calculator' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
+            >
+              Risk Calculator
+            </Link>
             <a href="#how-it-works" className="text-gray-700 hover:text-grass-600 font-medium">
               How It Works
             </a>

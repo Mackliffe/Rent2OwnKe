@@ -167,6 +167,18 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
   - All loan buttons renamed to "Apply for Rent to Own" for consistent terminology
   - Fixed grass-green color palette configuration in Tailwind for proper button styling
 
+- January 27, 2025: Interactive Property Investment Risk Calculator
+  - Built comprehensive risk assessment tool analyzing multiple investment factors
+  - Implemented financial risk analysis (debt-to-income ratio, down payment, employment stability)
+  - Added location-based risk scoring for major Kenyan cities and regions
+  - Created market risk evaluation based on property type and market exposure
+  - Integrated credit score analysis and liquidity risk assessment
+  - Real-time risk scoring with weighted calculations (0-100 scale)
+  - Dynamic recommendations, strengths identification, and risk warnings
+  - Visual progress indicators and color-coded risk levels (Low/Moderate/High/Very High)
+  - Added navigation link and dedicated page at /risk-calculator
+  - Kenya-specific parameters and considerations for local real estate market
+
 ## Changelog
 - June 28, 2025: Initial setup
 - January 26, 2025: Completed Kenya-focused rent-to-own platform with full functionality
