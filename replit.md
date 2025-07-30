@@ -203,6 +203,18 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
   - Created dedicated recommendations page at /recommendations
   - Updated navigation and footer quick links with all new features
 
+- January 27, 2025: Intuitive Onboarding Wizard for First-Time Property Investors
+  - Built comprehensive 7-step onboarding wizard for new users
+  - Created educational content explaining rent-to-own investment concepts
+  - Implemented experience level assessment (first-time, some experience, experienced)
+  - Added financial planning step with budget and income input
+  - Built investment goals selection with visual icons and descriptions
+  - Created property preferences wizard for locations, types, and lifestyle factors
+  - Added risk tolerance assessment and investment timeline planning
+  - Implemented smart routing based on user interests after completion
+  - Enhanced "Get Started" button with onboarding flow detection
+  - Added onboarding entry points in navigation for new users
+
 ## Changelog
 - June 28, 2025: Initial setup
 - January 26, 2025: Completed Kenya-focused rent-to-own platform with full functionality

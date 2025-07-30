@@ -50,6 +50,16 @@ export default function Navigation() {
             >
               AI Recommendations
             </Link>
+            
+            {/* Show onboarding for new users */}
+            {!localStorage.getItem('onboardingCompleted') && !localStorage.getItem('onboardingSkipped') && (
+              <Link 
+                href="/onboarding" 
+                className="bg-grass-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-grass-700 transition-colors"
+              >
+                Get Started
+              </Link>
+            )}
             <a href="#how-it-works" className="text-gray-700 hover:text-grass-600 font-medium">
               How It Works
             </a>

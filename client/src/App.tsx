@@ -9,6 +9,7 @@ import Calculator from "@/pages/calculator";
 import RiskCalculatorPage from "@/pages/risk-calculator";
 import MarketTrendsPage from "@/pages/market-trends";
 import RecommendationsPage from "@/pages/recommendations";
+import OnboardingPage from "@/pages/onboarding";
 import SignUp from "@/pages/signup";
 import SignIn from "@/pages/signin";
 import APISettings from "@/pages/api-settings";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/risk-calculator" component={RiskCalculatorPage} />
       <Route path="/market-trends" component={MarketTrendsPage} />
       <Route path="/recommendations" component={RecommendationsPage} />
+      <Route path="/onboarding" component={OnboardingPage} />
       <Route path="/signup" component={SignUp} />
       <Route path="/signin" component={SignIn} />
       <Route path="/api-settings" component={APISettings} />

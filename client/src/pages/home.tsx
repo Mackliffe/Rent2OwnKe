@@ -73,7 +73,38 @@ export default function Home() {
               Discover affordable rent-to-own properties across Kenya. Start renting today and own your dream home tomorrow with flexible payment plans.
             </p>
             
-            <PropertySearch onSearch={handleSearch} />
+            <div className="space-y-6">
+              <div className="flex gap-4 justify-center">
+                <Button 
+                  size="lg" 
+                  className="bg-grass-600 hover:bg-grass-700 text-white"
+                  onClick={() => {
+                    // Check if user has completed onboarding
+                    const completed = localStorage.getItem('onboardingCompleted');
+                    const skipped = localStorage.getItem('onboardingSkipped');
+                    
+                    if (!completed && !skipped) {
+                      window.location.href = '/onboarding';
+                    } else {
+                      window.location.href = '/recommendations';
+                    }
+                  }}
+                >
+                  Get Started
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  onClick={() => {
+                    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Learn More
+                </Button>
+              </div>
+              
+              <PropertySearch onSearch={handleSearch} />
+            </div>
           </div>
         </div>
       </section>
