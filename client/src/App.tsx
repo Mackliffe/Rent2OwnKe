@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import PropertyDetails from "@/pages/property-details";
 import Calculator from "@/pages/calculator";
 import RiskCalculatorPage from "@/pages/risk-calculator";
+import MarketTrendsPage from "@/pages/market-trends";
 import SignUp from "@/pages/signup";
 import SignIn from "@/pages/signin";
 import APISettings from "@/pages/api-settings";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/property/:id" component={PropertyDetails} />
       <Route path="/calculator" component={Calculator} />
       <Route path="/risk-calculator" component={RiskCalculatorPage} />
+      <Route path="/market-trends" component={MarketTrendsPage} />
       <Route path="/signup" component={SignUp} />
       <Route path="/signin" component={SignIn} />
       <Route path="/api-settings" component={APISettings} />
