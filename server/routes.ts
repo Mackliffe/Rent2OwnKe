@@ -307,6 +307,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Recommendations routes
+  app.post("/api/recommendations/analyze-intent", async (req, res) => {
+    try {
+      const { query } = req.body;
+      const { recommendationEngine } = await import("./recommendation-engine");
+      const intent = recommendationEngine.analyzeSearchIntent(query);
+      res.json(intent);
+    } catch (error) {
+      console.error("Error analyzing search intent:", error);
+      res.status(500).json({ message: "Failed to analyze search intent" });
+    }
+  });
+
+  app.post("/api/recommendations/generate", async (req, res) => {
+    try {
+      const { preferences } = req.body;
+      const { recommendationEngine } = await import("./recommendation-engine");
+      
+      // Get all properties
+      const properties = await storage.getProperties();
+      
+      // Generate recommendations
+      const recommendations = recommendationEngine.generateRecommendations(
+        properties,
+        { ...preferences, userId: "demo-user" }
+      );
+      
+      // Attach property details to recommendations
+      const enrichedRecommendations = recommendations.slice(0, 6).map(rec => ({
+        ...rec,
+        property: properties.find(p => p.id === rec.propertyId)
+      }));
+      
+      res.json(enrichedRecommendations);
+    } catch (error) {
+      console.error("Error generating recommendations:", error);
+      res.status(500).json({ message: "Failed to generate recommendations" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

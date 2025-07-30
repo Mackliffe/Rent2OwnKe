@@ -44,6 +44,12 @@ export default function Navigation() {
             >
               Market Trends
             </Link>
+            <Link 
+              href="/recommendations" 
+              className={`font-medium ${location === '/recommendations' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
+            >
+              AI Recommendations
+            </Link>
             <a href="#how-it-works" className="text-gray-700 hover:text-grass-600 font-medium">
               How It Works
             </a>

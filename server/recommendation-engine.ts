@@ -168,7 +168,7 @@ export class RecommendationEngine {
     // Property type preference (20%)
     maxScore += 20;
     if (preferences.propertyTypes.length > 0) {
-      if (preferences.propertyTypes.includes(property.type.toLowerCase())) {
+      if (preferences.propertyTypes.includes(property.propertyType.toLowerCase())) {
         score += 20;
       }
     } else {
@@ -330,8 +330,8 @@ export class RecommendationEngine {
     }
 
     // Property type match
-    if (preferences.propertyTypes.includes(property.type.toLowerCase())) {
-      reasons.push(`Matches your preferred property type: ${property.type}`);
+    if (preferences.propertyTypes.includes(property.propertyType.toLowerCase())) {
+      reasons.push(`Matches your preferred property type: ${property.propertyType}`);
     }
 
     // Budget fit
@@ -424,7 +424,7 @@ export class RecommendationEngine {
   ): string {
     const locationData = marketData[property.location.toLowerCase()];
     
-    let note = `This ${property.type.toLowerCase()} in ${property.location}`;
+    let note = `This ${property.propertyType.toLowerCase()} in ${property.location}`;
     
     // Add specific appeal based on preferences
     if (preferences.investmentGoals.includes("first-home")) {

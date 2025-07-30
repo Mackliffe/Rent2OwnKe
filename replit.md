@@ -191,6 +191,18 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
   - Added to navigation and accessible at /market-trends
   - Color-coded performance indicators and trend analysis tools
 
+- January 27, 2025: Personalized Property Recommendations with AI Insights
+  - Built intelligent recommendation engine using rule-based AI analysis
+  - Implemented smart search with natural language query understanding
+  - Created personalized match scoring system (0-100%) based on user preferences
+  - Added financial fit analysis with affordability and investment potential scoring
+  - Integrated market insights showing price competitiveness and trends
+  - Built preference customization system for locations, property types, and goals
+  - Generated personalized reasons and AI insights for each recommendation
+  - Added confidence scoring and detailed recommendation explanations
+  - Created dedicated recommendations page at /recommendations
+  - Updated navigation and footer quick links with all new features
+
 ## Changelog
 - June 28, 2025: Initial setup
 - January 26, 2025: Completed Kenya-focused rent-to-own platform with full functionality

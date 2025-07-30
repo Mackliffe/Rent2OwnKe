@@ -198,11 +198,12 @@ export default function Home() {
             <div>
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-grass-400">Browse Properties</a></li>
-                <li><a href="#" className="hover:text-grass-400">Calculator</a></li>
-                <li><a href="#" className="hover:text-grass-400">How It Works</a></li>
-                <li><a href="#" className="hover:text-grass-400">FAQs</a></li>
-                <li><a href="#" className="hover:text-grass-400">Contact Us</a></li>
+                <li><a href="/" className="hover:text-grass-400">Browse Properties</a></li>
+                <li><a href="/calculator" className="hover:text-grass-400">Payment Calculator</a></li>
+                <li><a href="/risk-calculator" className="hover:text-grass-400">Risk Calculator</a></li>
+                <li><a href="/market-trends" className="hover:text-grass-400">Market Trends</a></li>
+                <li><a href="/recommendations" className="hover:text-grass-400">AI Recommendations</a></li>
+                <li><a href="#how-it-works" className="hover:text-grass-400">How It Works</a></li>
               </ul>
             </div>
             
