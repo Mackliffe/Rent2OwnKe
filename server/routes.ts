@@ -327,7 +327,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { recommendationEngine } = await import("./recommendation-engine");
       
       // Get all properties
-      const properties = await storage.getProperties();
+      let properties = await storage.getProperties();
+      
+      // Apply basic filtering based on preferences before recommendation scoring
+      if (preferences.preferredLocations && preferences.preferredLocations.length > 0) {
+        properties = properties.filter(p => 
+          preferences.preferredLocations.some(loc => 
+            p.location.toLowerCase().includes(loc.toLowerCase()) ||
+            p.city.toLowerCase().includes(loc.toLowerCase())
+          )
+        );
+      }
+      
+      if (preferences.propertyTypes && preferences.propertyTypes.length > 0) {
+        properties = properties.filter(p => 
+          preferences.propertyTypes.some(type => 
+            p.propertyType.toLowerCase().includes(type.toLowerCase())
+          )
+        );
+      }
+      
+      if (preferences.budgetMax) {
+        properties = properties.filter(p => p.price <= preferences.budgetMax!);
+      }
+      
+      if (preferences.budgetMin) {
+        properties = properties.filter(p => p.price >= preferences.budgetMin!);
+      }
+      
+      if (preferences.bedroomPreference) {
+        properties = properties.filter(p => p.bedrooms === preferences.bedroomPreference);
+      }
       
       // Generate recommendations with proper defaults
       const userPreferences = {

@@ -39,7 +39,7 @@ export class RecommendationEngine {
 
     // Extract location
     let location: string | undefined;
-    const locations = ["nairobi", "mombasa", "kisumu", "nakuru", "eldoret", "thika", "kiambu"];
+    const locations = ["nairobi", "mombasa", "kisumu", "nakuru", "eldoret", "thika", "kiambu", "karen", "westlands", "kilimani"];
     for (const loc of locations) {
       if (lowercaseQuery.includes(loc)) {
         location = loc;

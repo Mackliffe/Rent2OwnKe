@@ -72,10 +72,8 @@ export default function PropertyRecommendations() {
   const [showPreferences, setShowPreferences] = useState(false);
 
   // Fetch recommendations
-  const { data: recommendations, isLoading, refetch } = useQuery<PropertyRecommendation[]>({
-    queryKey: ["/api/recommendations", preferences],
-    enabled: false, // Manual trigger
-  });
+  const [recommendations, setRecommendations] = useState<PropertyRecommendation[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Search intent analysis
   const analyzeIntentMutation = useMutation({
@@ -92,8 +90,7 @@ export default function PropertyRecommendations() {
       return response.json();
     },
     onSuccess: (data) => {
-      // Manually update the query data
-      // In a real app, you'd use queryClient.setQueryData
+      setRecommendations(data || []);
     },
   });
 
@@ -119,13 +116,17 @@ export default function PropertyRecommendations() {
       }
       
       setPreferences(updatedPreferences);
-      generateRecommendations(updatedPreferences);
+      await generateRecommendations(updatedPreferences);
     }
   };
 
   const generateRecommendations = async (prefs: UserPreferences = preferences) => {
-    await generateRecommendationsMutation.mutateAsync(prefs);
-    refetch();
+    setIsLoading(true);
+    try {
+      await generateRecommendationsMutation.mutateAsync(prefs);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getMatchScoreColor = (score: number) => {
@@ -205,6 +206,12 @@ export default function PropertyRecommendations() {
               <p className="text-sm text-blue-800">
                 <strong>AI Analysis:</strong> {analyzeIntentMutation.data.intent} search detected. 
                 Confidence: {Math.round(analyzeIntentMutation.data.confidence * 100)}%
+                {analyzeIntentMutation.data.extractedFilters.location && (
+                  <span className="ml-2">• Location: {analyzeIntentMutation.data.extractedFilters.location}</span>
+                )}
+                {analyzeIntentMutation.data.extractedFilters.propertyType && (
+                  <span className="ml-2">• Type: {analyzeIntentMutation.data.extractedFilters.propertyType}</span>
+                )}
               </p>
             </div>
           )}
@@ -230,7 +237,7 @@ export default function PropertyRecommendations() {
             </Button>
           </div>
 
-          {isLoading && (
+          {(isLoading || generateRecommendationsMutation.isPending) && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
                 <Card key={i} className="animate-pulse">
@@ -375,15 +382,20 @@ export default function PropertyRecommendations() {
             </div>
           )}
 
-          {!isLoading && (!recommendations || recommendations.length === 0) && (
+          {!isLoading && !generateRecommendationsMutation.isPending && recommendations.length === 0 && (
             <Card className="text-center py-12">
               <CardContent>
                 <Search className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Recommendations Yet</h3>
-                <p className="text-gray-600 mb-4">Set your preferences and generate personalized property recommendations</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No Properties Found</h3>
+                <p className="text-gray-600 mb-4">
+                  {searchQuery ? 
+                    `No properties match your search for "${searchQuery}". Try adjusting your preferences or search terms.` :
+                    "Set your preferences and generate personalized property recommendations"
+                  }
+                </p>
                 <Button onClick={() => generateRecommendations()} className="bg-grass-600 hover:bg-grass-700">
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Generate Recommendations
+                  {searchQuery ? 'Try Different Search' : 'Generate Recommendations'}
                 </Button>
               </CardContent>
             </Card>
