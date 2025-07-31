@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Home, LogIn } from "lucide-react";
+import { FaGoogle } from "react-icons/fa";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -59,6 +61,28 @@ export default function SignIn() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Google Sign In Button */}
+            <div className="mb-6">
+              <Button 
+                type="button"
+                variant="outline"
+                className="w-full border-gray-300 hover:bg-gray-50"
+                onClick={() => window.location.href = '/api/login'}
+              >
+                <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
+                Continue with Google
+              </Button>
+            </div>
+
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">Or continue with email</span>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
