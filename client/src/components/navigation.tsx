@@ -9,11 +9,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { useDemoAuth } from "@/hooks/useDemoAuth";
 
 export default function Navigation() {
   const [location] = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated: isDemoAuthenticated } = useDemoAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const isUserAuthenticated = isAuthenticated || isDemoAuthenticated;
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -85,37 +89,52 @@ export default function Navigation() {
               AI Recommendations
             </Link>
             
-            {isAuthenticated && (
+            {isUserAuthenticated && (
               <Link 
-                href="/property-journey" 
-                className={`font-medium ${location === '/property-journey' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
+                href="/dashboard" 
+                className={`font-medium ${location === '/dashboard' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
               >
-                Journey Tracker
+                My Dashboard
               </Link>
             )}
           </div>
           
           <div className="flex items-center space-x-4">
-            {!isLoading && isAuthenticated && (
+            {!isLoading && isUserAuthenticated && (
               <>
-                <Link href="/api-settings">
-                  <Button variant="ghost" className="text-green-600 hover:text-green-700">
-                    API Settings
-                  </Button>
-                </Link>
+                {isAuthenticated && (
+                  <Link href="/api-settings">
+                    <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                      API Settings
+                    </Button>
+                  </Link>
+                )}
                 <Link href="/dashboard">
                   <Button variant="ghost" className="text-green-600 hover:text-green-700">
                     My Dashboard
                   </Button>
                 </Link>
-                <Link href="/api/logout">
-                  <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                {isAuthenticated ? (
+                  <Link href="/api/logout">
+                    <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                      Sign Out
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    className="text-green-600 hover:text-green-700"
+                    onClick={() => {
+                      localStorage.removeItem("demo_user_session");
+                      window.location.href = "/";
+                    }}
+                  >
                     Sign Out
                   </Button>
-                </Link>
+                )}
               </>
             )}
-            {!isLoading && !isAuthenticated && (
+            {!isLoading && !isUserAuthenticated && (
               <>
                 <Link href="/signin" className="hidden md:inline-block">
                   <Button variant="ghost" className="text-green-600 hover:text-green-700">

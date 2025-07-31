@@ -7,9 +7,15 @@ import RentCalculator from "@/components/rent-calculator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Calculator, Home as HomeIcon, Play, Phone } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useDemoAuth } from "@/hooks/useDemoAuth";
 import type { Property } from "@shared/schema";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+  const { isAuthenticated: isDemoAuthenticated } = useDemoAuth();
+  const isUserAuthenticated = isAuthenticated || isDemoAuthenticated;
+  
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     city: "all",
     propertyType: "all",
@@ -74,42 +80,44 @@ export default function Home() {
             </p>
             
             <div className="space-y-6">
-              <div className="flex gap-4 justify-center flex-wrap">
-                <Button 
-                  size="lg" 
-                  className="bg-grass-600 hover:bg-grass-700 text-white"
-                  onClick={() => {
-                    // Check if user has completed onboarding
-                    const completed = localStorage.getItem('onboardingCompleted');
-                    const skipped = localStorage.getItem('onboardingSkipped');
-                    
-                    if (!completed && !skipped) {
-                      window.location.href = '/onboarding';
-                    } else {
-                      window.location.href = '/recommendations';
-                    }
-                  }}
-                >
-                  Get Started
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="border-grass-600 text-grass-600 hover:bg-grass-50"
-                  onClick={() => window.location.href = '/demo-user'}
-                >
-                  Try Demo User
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  onClick={() => {
-                    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  Learn More
-                </Button>
-              </div>
+              {!isUserAuthenticated && (
+                <div className="flex gap-4 justify-center flex-wrap">
+                  <Button 
+                    size="lg" 
+                    className="bg-grass-600 hover:bg-grass-700 text-white"
+                    onClick={() => {
+                      // Check if user has completed onboarding
+                      const completed = localStorage.getItem('onboardingCompleted');
+                      const skipped = localStorage.getItem('onboardingSkipped');
+                      
+                      if (!completed && !skipped) {
+                        window.location.href = '/onboarding';
+                      } else {
+                        window.location.href = '/recommendations';
+                      }
+                    }}
+                  >
+                    Get Started
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="border-grass-600 text-grass-600 hover:bg-grass-50"
+                    onClick={() => window.location.href = '/demo-user'}
+                  >
+                    Try Demo User
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    onClick={() => {
+                      document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
+                    Learn More
+                  </Button>
+                </div>
+              )}
               
               <PropertySearch onSearch={handleSearch} />
             </div>
