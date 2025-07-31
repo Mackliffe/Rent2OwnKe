@@ -107,11 +107,6 @@ export default function Navigation() {
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/signup">
-                  <Button variant="ghost" className="text-green-600 hover:text-green-700">
-                    Sign Up
-                  </Button>
-                </Link>
                 <Link href="/onboarding">
                   <Button className="bg-grass-600 hover:bg-grass-700 text-white">
                     Get Started
@@ -186,11 +181,6 @@ export default function Navigation() {
                     <Link href="/signin" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start text-green-600 hover:text-green-700">
                         Sign In
-                      </Button>
-                    </Link>
-                    <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="ghost" className="w-full justify-start text-green-600 hover:text-green-700">
-                        Sign Up
                       </Button>
                     </Link>
                     <Link href="/onboarding" onClick={() => setMobileMenuOpen(false)}>
