@@ -235,6 +235,7 @@ export default function Home() {
                 <li><a href="/market-trends" className="hover:text-grass-400">Market Trends</a></li>
                 <li><a href="/recommendations" className="hover:text-grass-400">AI Recommendations</a></li>
                 <li><a href="#how-it-works" className="hover:text-grass-400">How It Works</a></li>
+                <li><a href="/admin-login" className="hover:text-grass-400">Admin Portal</a></li>
               </ul>
             </div>
             

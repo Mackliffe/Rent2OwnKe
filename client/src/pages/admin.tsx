@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,12 +23,25 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState("overview");
+  const [, setLocation] = useLocation();
 
   // Check if user is admin
   const { data: isAdmin, isLoading: adminLoading } = useQuery({
     queryKey: ["/api/admin/check"],
     retry: false,
   });
+
+  // Redirect to admin login if not admin
+  useEffect(() => {
+    if (!adminLoading && !isAdmin) {
+      toast({
+        title: "Access Denied",
+        description: "Admin credentials required to access this page",
+        variant: "destructive",
+      });
+      setLocation("/admin-login");
+    }
+  }, [isAdmin, adminLoading, setLocation, toast]);
 
   // Dashboard statistics
   const { data: stats, isLoading: statsLoading } = useQuery({
