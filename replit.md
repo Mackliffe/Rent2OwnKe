@@ -141,12 +141,14 @@ Rent2Own Kenya is a full-stack web application that provides a rent-to-own prope
   - Enhanced navigation with "My Dashboard" link for easy access to application tracking
   - Complete loan application flow now available from every property touchpoint
 
-- January 27, 2025: Smart Navigation with Authentication-Based Visibility
-  - Updated navigation to conditionally show links based on user authentication status
-  - "My Dashboard" and "API Settings" links now only visible for signed-in users
-  - Non-authenticated users see only "Sign In" and "Get Started" options
-  - Authenticated users see "API Settings", "My Dashboard", and "Sign Out" options
-  - Enhanced user experience with context-appropriate navigation options
+- January 31, 2025: Redesigned Navigation Menu with Mobile Hamburger Interface
+  - Reorganized main navigation with new hierarchy: Browse Properties, Calculators (dropdown), How It Works, Market Trends, AI Recommendations
+  - Implemented dropdown menu for Calculators containing Payment Calculator and Risk Calculator with icons
+  - Removed Contact menu item and Sign Up link for cleaner interface
+  - Created logo-triggered mobile navigation: clicking Rent2Own logo opens slide-out menu from left
+  - Built responsive hamburger menu with smooth animations, organized sections, and backdrop overlay
+  - Enhanced mobile experience with dedicated Calculators section and authentication buttons
+  - Maintained desktop navigation with proper dropdown functionality and visual indicators
 
 - January 27, 2025: Seamless Loan Application Flow Without Required Sign-In
   - Implemented automatic authentication system for loan applications
