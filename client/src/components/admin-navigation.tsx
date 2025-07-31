@@ -105,7 +105,12 @@ export default function AdminNavigation({ currentPage = "home" }: AdminNavigatio
             <Button
               variant="ghost"
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={() => window.location.href = "/api/logout"}
+              onClick={() => {
+                // Clear admin session
+                localStorage.removeItem("admin_session");
+                // Redirect to admin login
+                window.location.href = "/admin-login";
+              }}
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
