@@ -526,6 +526,34 @@ export default function MarketTrends() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Data Source Attribution */}
+      <Card className="mt-8 border-l-4 border-l-grass-500">
+        <CardContent className="p-6">
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-grass-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <BarChart3 className="w-4 h-4 text-grass-600" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold text-gray-900">Data Sources & Methodology</h3>
+              <div className="text-sm text-gray-600 space-y-1">
+                <p><strong>Current Status:</strong> This dashboard displays demonstration data to showcase market analysis capabilities.</p>
+                <p><strong>Real Data Integration:</strong> In production, this system connects to:</p>
+                <ul className="list-disc ml-4 space-y-1">
+                  <li>Kenya Property Portal API for transaction data</li>
+                  <li>BuyRentKenya for inventory and listing metrics</li>
+                  <li>PropertyPoint Kenya for price trends and valuations</li>
+                  <li>Central Bank of Kenya for economic indicators</li>
+                </ul>
+                <p><strong>Data Refresh:</strong> Real market data updates daily at 6:00 AM EAT</p>
+                <p className="text-xs text-grass-600 mt-3">
+                  <strong>Note:</strong> All price trends, growth rates, and market statistics shown are representative of typical Kenyan real estate patterns but are generated for demonstration purposes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
