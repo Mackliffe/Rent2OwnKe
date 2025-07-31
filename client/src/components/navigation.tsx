@@ -1,11 +1,19 @@
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Home, Calculator, Phone } from "lucide-react";
+import { Home, Calculator, TrendingDown, ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Navigation() {
   const [location] = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -26,46 +34,50 @@ export default function Navigation() {
             >
               Browse Properties
             </Link>
-            <Link 
-              href="/calculator" 
-              className={`font-medium ${location === '/calculator' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
-            >
-              Calculator
-            </Link>
-            <Link 
-              href="/risk-calculator" 
-              className={`font-medium ${location === '/risk-calculator' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
-            >
-              Risk Calculator
-            </Link>
+            
+            {/* Calculators Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className={`font-medium flex items-center space-x-1 ${
+                location === '/calculator' || location === '/risk-calculator' 
+                  ? 'text-grass-600' 
+                  : 'text-gray-700 hover:text-grass-600'
+              }`}>
+                <span>Calculators</span>
+                <ChevronDown className="w-4 h-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                  <Link href="/calculator" className="flex items-center space-x-2 w-full">
+                    <Calculator className="w-4 h-4" />
+                    <span>Payment Calculator</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/risk-calculator" className="flex items-center space-x-2 w-full">
+                    <TrendingDown className="w-4 h-4" />
+                    <span>Risk Calculator</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <a href="#how-it-works" className="text-gray-700 hover:text-grass-600 font-medium">
+              How It Works
+            </a>
+            
             <Link 
               href="/market-trends" 
               className={`font-medium ${location === '/market-trends' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
             >
               Market Trends
             </Link>
+            
             <Link 
               href="/recommendations" 
               className={`font-medium ${location === '/recommendations' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
             >
               AI Recommendations
             </Link>
-            
-            {/* Show onboarding for new users */}
-            {!localStorage.getItem('onboardingCompleted') && !localStorage.getItem('onboardingSkipped') && (
-              <Link 
-                href="/onboarding" 
-                className="bg-grass-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-grass-700 transition-colors"
-              >
-                Get Started
-              </Link>
-            )}
-            <a href="#how-it-works" className="text-gray-700 hover:text-grass-600 font-medium">
-              How It Works
-            </a>
-            <a href="#contact" className="text-gray-700 hover:text-grass-600 font-medium">
-              Contact
-            </a>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -81,6 +93,11 @@ export default function Navigation() {
                     My Dashboard
                   </Button>
                 </Link>
+                <Link href="/api/logout">
+                  <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                    Sign Out
+                  </Button>
+                </Link>
               </>
             )}
             {!isLoading && !isAuthenticated && (
@@ -91,21 +108,121 @@ export default function Navigation() {
                   </Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="bg-green-600 hover:bg-green-700 text-white">
+                  <Button variant="ghost" className="text-green-600 hover:text-green-700">
+                    Sign Up
+                  </Button>
+                </Link>
+                <Link href="/onboarding">
+                  <Button className="bg-grass-600 hover:bg-grass-700 text-white">
                     Get Started
                   </Button>
                 </Link>
               </>
             )}
-            {!isLoading && isAuthenticated && (
-              <Link href="/api/logout">
-                <Button variant="ghost" className="text-green-600 hover:text-green-700">
-                  Sign Out
-                </Button>
-              </Link>
-            )}
+            
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </Button>
           </div>
         </div>
+        
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-200">
+            <div className="px-4 py-2 space-y-1">
+              <Link 
+                href="/" 
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-grass-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Browse Properties
+              </Link>
+              <Link 
+                href="/calculator" 
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-grass-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Payment Calculator
+              </Link>
+              <Link 
+                href="/risk-calculator" 
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-grass-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Risk Calculator
+              </Link>
+              <a 
+                href="#how-it-works" 
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-grass-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                How It Works
+              </a>
+              <Link 
+                href="/market-trends" 
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-grass-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Market Trends
+              </Link>
+              <Link 
+                href="/recommendations" 
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-grass-600"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                AI Recommendations
+              </Link>
+              
+              {/* Mobile auth buttons */}
+              <div className="pt-4 border-t border-gray-200">
+                {!isLoading && !isAuthenticated && (
+                  <>
+                    <Link href="/signin" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start text-green-600 hover:text-green-700">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start text-green-600 hover:text-green-700">
+                        Sign Up
+                      </Button>
+                    </Link>
+                    <Link href="/onboarding" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full bg-grass-600 hover:bg-grass-700 text-white mt-2">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
+                {!isLoading && isAuthenticated && (
+                  <>
+                    <Link href="/api-settings" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start text-green-600 hover:text-green-700">
+                        API Settings
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start text-green-600 hover:text-green-700">
+                        My Dashboard
+                      </Button>
+                    </Link>
+                    <Link href="/api/logout" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start text-green-600 hover:text-green-700">
+                        Sign Out
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
