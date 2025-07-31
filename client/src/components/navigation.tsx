@@ -71,6 +71,12 @@ export default function Navigation() {
               </DropdownMenuContent>
             </DropdownMenu>
             
+            {!isUserAuthenticated && (
+              <a href="#how-it-works" className="text-gray-700 hover:text-grass-600 font-medium">
+                How It Works
+              </a>
+            )}
+            
             <Link 
               href="/market-trends" 
               className={`font-medium ${location === '/market-trends' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
@@ -227,6 +233,16 @@ export default function Navigation() {
                   </div>
                 </Link>
               </div>
+              
+              {!isUserAuthenticated && (
+                <a 
+                  href="#how-it-works" 
+                  className="block px-3 py-3 text-base font-medium text-gray-700 hover:text-grass-600 hover:bg-grass-50 rounded-lg transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  How It Works
+                </a>
+              )}
               
               <Link 
                 href="/market-trends" 
