@@ -1,4 +1,4 @@
-import { properties, locations, propertyApplications, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom, type PropertyApplication, type InsertPropertyApplication } from "@shared/schema";
+import { properties, locations, propertyApplications, users, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom, type PropertyApplication, type InsertPropertyApplication, type User } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte } from "drizzle-orm";
 
@@ -11,6 +11,7 @@ export interface IStorage {
   getPropertiesByType(propertyType: string): Promise<Property[]>;
   searchProperties(filters: PropertySearchFilters): Promise<Property[]>;
   createProperty(property: InsertProperty): Promise<Property>;
+  updateProperty(id: number, updates: Partial<Property>): Promise<Property>;
   
   // Locations
   getLocations(): Promise<Location[]>;
@@ -21,6 +22,12 @@ export interface IStorage {
   getPropertyApplication(userId: string, propertyId: number): Promise<PropertyApplication | undefined>;
   createPropertyApplication(application: InsertPropertyApplication): Promise<PropertyApplication>;
   updateApplicationStatus(id: number, status: string): Promise<PropertyApplication>;
+  getAllApplications(): Promise<PropertyApplication[]>;
+  getAllApplicationsWithDetails(): Promise<any[]>;
+  
+  // Users
+  getAllUsers(): Promise<User[]>;
+  getUserByEmail(email: string): Promise<User | undefined>;
 }
 
 export type PropertySearchFilters = {
@@ -162,6 +169,46 @@ export class DatabaseStorage implements IStorage {
       .where(eq(propertyApplications.id, id))
       .returning();
     return updated;
+  }
+
+  async updateProperty(id: number, updates: Partial<Property>): Promise<Property> {
+    const [updated] = await db
+      .update(properties)
+      .set({ ...updates })
+      .where(eq(properties.id, id))
+      .returning();
+    return updated;
+  }
+
+  async getAllApplications(): Promise<PropertyApplication[]> {
+    return await db.select().from(propertyApplications);
+  }
+
+  async getAllApplicationsWithDetails(): Promise<any[]> {
+    const results = await db
+      .select({
+        application: propertyApplications,
+        property: properties,
+        user: users,
+      })
+      .from(propertyApplications)
+      .leftJoin(properties, eq(propertyApplications.propertyId, properties.id))
+      .leftJoin(users, eq(propertyApplications.userId, users.id));
+
+    return results.map(result => ({
+      ...result.application,
+      property: result.property,
+      user: result.user,
+    }));
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
 }
 
@@ -430,6 +477,32 @@ export class MemStorage implements IStorage {
 
   async updateApplicationStatus(id: number, status: string): Promise<PropertyApplication> {
     throw new Error("Property applications not supported in memory storage");
+  }
+
+  async updateProperty(id: number, updates: Partial<Property>): Promise<Property> {
+    const property = this.properties.get(id);
+    if (!property) {
+      throw new Error("Property not found");
+    }
+    const updated = { ...property, ...updates };
+    this.properties.set(id, updated);
+    return updated;
+  }
+
+  async getAllApplications(): Promise<PropertyApplication[]> {
+    throw new Error("Property applications not supported in memory storage");
+  }
+
+  async getAllApplicationsWithDetails(): Promise<any[]> {
+    throw new Error("Property applications not supported in memory storage");
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    throw new Error("User management not supported in memory storage");
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    throw new Error("User management not supported in memory storage");
   }
 }
 

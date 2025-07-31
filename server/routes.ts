@@ -332,7 +332,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Apply basic filtering based on preferences before recommendation scoring
       if (preferences.preferredLocations && preferences.preferredLocations.length > 0) {
         properties = properties.filter(p => 
-          preferences.preferredLocations.some(loc => 
+          preferences.preferredLocations.some((loc: string) => 
             p.location.toLowerCase().includes(loc.toLowerCase()) ||
             p.city.toLowerCase().includes(loc.toLowerCase())
           )
@@ -341,7 +341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (preferences.propertyTypes && preferences.propertyTypes.length > 0) {
         properties = properties.filter(p => 
-          preferences.propertyTypes.some(type => 
+          preferences.propertyTypes.some((type: string) => 
             p.propertyType.toLowerCase().includes(type.toLowerCase())
           )
         );
@@ -391,6 +391,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating recommendations:", error);
       res.status(500).json({ message: "Failed to generate recommendations" });
+    }
+  });
+
+  // Admin API endpoints
+  
+  // Check if user is admin
+  app.get("/api/admin/check", async (req, res) => {
+    try {
+      // For demo purposes, we'll check if the current user has admin role
+      // In production, this would use proper authentication middleware
+      const adminUser = await storage.getUserByEmail("admin@rent2own.co.ke");
+      if (adminUser) {
+        res.json(true);
+      } else {
+        res.json(false);
+      }
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      res.json(false);
+    }
+  });
+
+  // Get admin dashboard statistics
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      const properties = await storage.getProperties();
+      const applications = await storage.getAllApplications();
+      const users = await storage.getAllUsers();
+      
+      const stats = {
+        totalProperties: properties.length,
+        featuredProperties: properties.filter(p => p.featured).length,
+        totalApplications: applications.length,
+        pendingApplications: applications.filter((a: any) => a.status === 'pending').length,
+        totalUsers: users.length,
+        newUsersThisMonth: users.filter((u: any) => 
+          u.createdAt && new Date(u.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+        ).length,
+        avgPropertyValue: Math.round(properties.reduce((sum, p) => sum + p.price, 0) / properties.length)
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting admin stats:", error);
+      res.status(500).json({ message: "Failed to fetch admin statistics" });
+    }
+  });
+
+  // Get all properties for admin
+  app.get("/api/admin/properties", async (req, res) => {
+    try {
+      const properties = await storage.getProperties();
+      // Add application count for each property
+      const applications = await storage.getAllApplications();
+      const propertiesWithStats = properties.map(property => ({
+        ...property,
+        applicationCount: applications.filter((a: any) => a.propertyId === property.id).length
+      }));
+      
+      res.json(propertiesWithStats);
+    } catch (error) {
+      console.error("Error getting admin properties:", error);
+      res.status(500).json({ message: "Failed to fetch properties" });
+    }
+  });
+
+  // Update property for admin
+  app.patch("/api/admin/properties/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const updatedProperty = await storage.updateProperty(id, updates);
+      res.json(updatedProperty);
+    } catch (error) {
+      console.error("Error updating property:", error);
+      res.status(500).json({ message: "Failed to update property" });
+    }
+  });
+
+  // Get all applications for admin
+  app.get("/api/admin/applications", async (req, res) => {
+    try {
+      const applications = await storage.getAllApplicationsWithDetails();
+      res.json(applications);
+    } catch (error) {
+      console.error("Error getting admin applications:", error);
+      res.status(500).json({ message: "Failed to fetch applications" });
+    }
+  });
+
+  // Update application status
+  app.patch("/api/admin/applications/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      const updatedApplication = await storage.updateApplicationStatus(id, status);
+      res.json(updatedApplication);
+    } catch (error) {
+      console.error("Error updating application:", error);
+      res.status(500).json({ message: "Failed to update application" });
+    }
+  });
+
+  // Get all users for admin
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      const applications = await storage.getAllApplications();
+      
+      // Add application count for each user
+      const usersWithStats = users.map(user => ({
+        ...user,
+        applicationCount: applications.filter((a: any) => a.userId === user.id).length
+      }));
+      
+      res.json(usersWithStats);
+    } catch (error) {
+      console.error("Error getting admin users:", error);
+      res.status(500).json({ message: "Failed to fetch users" });
     }
   });
 

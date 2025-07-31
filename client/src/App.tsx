@@ -15,6 +15,7 @@ import SignIn from "@/pages/signin";
 import APISettings from "@/pages/api-settings";
 import LoanApplication from "@/pages/loan-application";
 import Dashboard from "@/pages/dashboard";
+import AdminDashboard from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/api-settings" component={APISettings} />
       <Route path="/loan-application/:propertyId" component={LoanApplication} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
