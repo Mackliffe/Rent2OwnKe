@@ -84,6 +84,13 @@ export default function Navigation() {
             >
               AI Recommendations
             </Link>
+            
+            <Link 
+              href="/property-journey" 
+              className={`font-medium ${location === '/property-journey' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
+            >
+              Journey Tracker
+            </Link>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -224,6 +231,13 @@ export default function Navigation() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 AI Recommendations
+              </Link>
+              <Link 
+                href="/property-journey" 
+                className="block px-3 py-3 text-base font-medium text-gray-700 hover:text-grass-600 hover:bg-grass-50 rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Journey Tracker
               </Link>
               
               {/* Auth Section */}

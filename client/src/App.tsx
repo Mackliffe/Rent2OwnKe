@@ -17,6 +17,7 @@ import LoanApplication from "@/pages/loan-application";
 import Dashboard from "@/pages/dashboard";
 import AdminDashboard from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
+import PropertyJourneyPage from "@/pages/property-journey";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/api-settings" component={APISettings} />
       <Route path="/loan-application/:propertyId" component={LoanApplication} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/property-journey" component={PropertyJourneyPage} />
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />

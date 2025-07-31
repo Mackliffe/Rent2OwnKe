@@ -1,12 +1,14 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
+import PropertyJourney from "@/components/property-journey";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatKES } from "@/lib/currency";
-import { Calendar, MapPin, Home, FileText, CreditCard, Clock, CheckCircle } from "lucide-react";
+import { Calendar, MapPin, Home, FileText, CreditCard, Clock, CheckCircle, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
 import type { PropertyApplication } from "@shared/schema";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -110,6 +112,56 @@ export default function Dashboard() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">My Dashboard</h1>
           <p className="text-gray-600">Welcome back, {user.firstName || user.email}</p>
+        </div>
+
+        {/* Journey Tracker Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          <div className="lg:col-span-2">
+            <PropertyJourney 
+              currentStep={(() => {
+                if (applications.length === 0) return "browse";
+                const hasApproved = applications.some(app => app.status === "approved");
+                const hasPending = applications.some(app => app.status === "pending" || app.status === "processing");
+                if (hasApproved) return "payment";
+                if (hasPending) return "approval";
+                return "apply";
+              })()}
+              onStepClick={(stepId) => {
+                if (stepId === "browse") window.location.href = "/";
+                if (stepId === "calculate") window.location.href = "/calculator";
+                if (stepId === "apply") window.location.href = "/loan-application/5";
+              }}
+              showAnimations={true}
+            />
+          </div>
+
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Link href="/property-journey">
+                  <Button variant="outline" className="w-full justify-between">
+                    View Full Journey
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <Link href="/">
+                  <Button variant="outline" className="w-full justify-between">
+                    Browse Properties
+                    <Home className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <Link href="/calculator">
+                  <Button variant="outline" className="w-full justify-between">
+                    Payment Calculator
+                    <CreditCard className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Stats Cards */}
