@@ -13,6 +13,7 @@ import {
   DollarSign, Users, BookOpen, Target, Lightbulb, CheckCircle,
   Star, Heart, Shield, Clock, Banknote, PiggyBank, Building2
 } from "lucide-react";
+import { Link } from "wouter";
 import { formatKES } from "@/lib/currency";
 
 interface OnboardingData {
@@ -533,8 +534,24 @@ export default function OnboardingWizard({ onComplete, onSkip }: OnboardingWizar
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-grass-50 to-grass-100">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center space-x-2 text-grass-600 hover:text-grass-700">
+              <ArrowLeft className="h-5 w-5" />
+              <span>Back to Home</span>
+            </Link>
+            <div className="flex items-center space-x-2">
+              <Home className="h-8 w-8 text-grass-600" />
+              <span className="text-xl font-bold text-grass-700">Rent2Own Kenya</span>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
