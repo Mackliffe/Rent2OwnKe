@@ -141,7 +141,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+            className="fixed inset-0 bg-black bg-opacity-50 z-[9998] flex items-center justify-center"
           >
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
@@ -208,7 +208,7 @@ export default function Home() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1 }}
           onClick={() => setShowGuide(true)}
-          className="fixed bottom-6 right-6 bg-grass-500 text-white p-3 rounded-full shadow-lg hover:bg-grass-600 transition-colors z-40"
+          className="fixed bottom-6 right-6 bg-grass-500 text-white p-3 rounded-full shadow-lg hover:bg-grass-600 transition-colors z-[9990]"
           title="Take a guided tour"
         >
           <Info className="w-6 h-6" />

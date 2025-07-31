@@ -71,6 +71,10 @@ export function GuideTooltip({
     
     if (!tooltipRect) return;
 
+    const margin = 20;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
     let x = 0;
     let y = 0;
 
@@ -127,7 +131,7 @@ export function GuideTooltip({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        className="fixed inset-0 bg-black bg-opacity-50 z-[9998]"
         onClick={onSkip}
       />
 
@@ -136,7 +140,7 @@ export function GuideTooltip({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed z-50 pointer-events-none"
+          className="fixed z-[9999] pointer-events-none"
           style={{
             left: targetElement.getBoundingClientRect().left - 5,
             top: targetElement.getBoundingClientRect().top - 5,
@@ -157,13 +161,14 @@ export function GuideTooltip({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ duration: 0.3 }}
-          className="fixed z-50 max-w-sm"
+          className="fixed z-[9999] max-w-sm"
           style={{
             left: tooltipPosition.x,
             top: tooltipPosition.y,
           }}
         >
-          <Card className="shadow-xl border-0">
+          <Card className="shadow-xl border-0 bg-white"
+                style={{ zIndex: 10000 }}>
             <CardContent className="p-0">
               {/* Header */}
               <div className="bg-grass-500 text-white p-4 rounded-t-lg">
@@ -176,7 +181,8 @@ export function GuideTooltip({
                   </div>
                   <button
                     onClick={onSkip}
-                    className="text-white hover:text-gray-200 transition-colors"
+                    className="text-white hover:text-gray-200 transition-colors z-[10001] relative"
+                    style={{ zIndex: 10001 }}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -213,7 +219,8 @@ export function GuideTooltip({
                   >
                     <Button
                       onClick={currentStepData.action.onClick}
-                      className="w-full bg-grass-600 hover:bg-grass-700 text-white"
+                      className="w-full bg-grass-600 hover:bg-grass-700 text-white z-[10001] relative"
+                      style={{ zIndex: 10001 }}
                     >
                       {currentStepData.action.text}
                     </Button>
@@ -231,7 +238,8 @@ export function GuideTooltip({
                     variant="ghost"
                     onClick={previousStep}
                     disabled={activeStep === 0}
-                    className="text-gray-600 hover:text-gray-800"
+                    className="text-gray-600 hover:text-gray-800 hover:bg-gray-100 z-[10001] relative"
+                    style={{ zIndex: 10001 }}
                   >
                     <ArrowLeft className="w-4 h-4 mr-1" />
                     Previous
@@ -252,7 +260,8 @@ export function GuideTooltip({
 
                   <Button
                     onClick={nextStep}
-                    className="bg-grass-600 hover:bg-grass-700 text-white"
+                    className="bg-grass-600 hover:bg-grass-700 text-white z-[10001] relative"
+                    style={{ zIndex: 10001 }}
                   >
                     {activeStep === steps.length - 1 ? (
                       <>
@@ -292,7 +301,7 @@ export function GuideTooltip({
         {`
           .guide-highlight {
             position: relative;
-            z-index: 51 !important;
+            z-index: 9997 !important;
             border-radius: 8px;
             animation: pulse-highlight 2s infinite;
           }

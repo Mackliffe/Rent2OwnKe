@@ -22,7 +22,11 @@ The application features a modern, accessible UI with a custom grass-green color
     - **Loan Application System**: Multi-step application form adhering to Kenyan KYC requirements, with automated authentication and application tracking.
     - **Market Trend Visualization**: Interactive charts for real-time Kenyan real estate market analytics.
     - **AI Recommendations**: Personalized property recommendations based on user preferences and AI insights.
-    - **Onboarding Wizard**: A guided 7-step process for new users, explaining rent-to-own concepts and gathering preferences.
+    - **Gentle Onboarding Animations**: Interactive guided tours with three core components:
+        - OnboardingAnimations: Step-by-step introduction with animated icons and progress tracking
+        - PropertyJourneyAnimation: Interactive timeline showing rent-to-own investment stages
+        - GuideTooltip: Smart overlay tooltips with contextual help and navigation
+    - **Enhanced User Experience**: Welcome animations, progressive feature disclosure, auto-play tours, and personalized guidance for new users.
     - **Risk Calculator**: An interactive tool assessing property investment risk specific to the Kenyan market.
     - **Property Journey Progress Tracker**: A playful visualization of the rent-to-own process with milestone animations.
 
