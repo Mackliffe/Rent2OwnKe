@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "framer-motion";
 import Navigation from "@/components/navigation";
 import PropertyCard from "@/components/property-card";
 import PropertySearch, { type SearchFilters } from "@/components/property-search";
 import RentCalculator from "@/components/rent-calculator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Calculator, Home as HomeIcon, Play, Phone } from "lucide-react";
+import { Search, Calculator, Home as HomeIcon, Play, Phone, Info, Lightbulb, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDemoAuth } from "@/hooks/useDemoAuth";
+import { GuideTooltip } from "@/components/onboarding/GuideTooltip";
 import type { Property } from "@shared/schema";
 
 export default function Home() {
@@ -21,6 +23,74 @@ export default function Home() {
     propertyType: "all",
     priceRange: "all"
   });
+
+  // Onboarding state
+  const [showGuide, setShowGuide] = useState(false);
+  const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
+
+  // Check if user is new and hasn't seen the guide
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('hasSeenPropertyGuide');
+    const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+    
+    if (!hasSeenGuide && !onboardingCompleted && !isUserAuthenticated) {
+      // Show welcome animation first for new users
+      setShowWelcomeAnimation(true);
+      setTimeout(() => {
+        setShowWelcomeAnimation(false);
+        setShowGuide(true);
+      }, 3000);
+    }
+  }, [isUserAuthenticated]);
+
+  // Guide steps for property exploration
+  const guideSteps = [
+    {
+      id: "search",
+      target: ".property-search",
+      title: "Start Your Property Search",
+      content: "Use our smart search to find properties that match your preferences. Filter by location, type, and price range.",
+      position: "bottom" as const
+    },
+    {
+      id: "calculator",
+      target: ".rent-calculator",
+      title: "Calculate Your Investment",
+      content: "See exactly how much you'll pay monthly and how you'll build equity over time with our rent-to-own calculator.",
+      position: "top" as const
+    },
+    {
+      id: "properties",
+      target: ".featured-properties",
+      title: "Explore Featured Properties",
+      content: "Browse our handpicked selection of properties. Click on any property to see detailed information and virtual tours.",
+      position: "top" as const
+    },
+    {
+      id: "call-to-action",
+      target: ".cta-section",
+      title: "Ready to Get Started?",
+      content: "When you're ready, try our demo account or begin the onboarding process to start your homeownership journey.",
+      position: "top" as const,
+      action: {
+        text: "Try Demo Account",
+        onClick: () => {
+          const demoButton = document.querySelector('.demo-login-button') as HTMLElement;
+          if (demoButton) demoButton.click();
+        }
+      }
+    }
+  ];
+
+  const handleCompleteGuide = () => {
+    localStorage.setItem('hasSeenPropertyGuide', 'true');
+    setShowGuide(false);
+  };
+
+  const handleSkipGuide = () => {
+    localStorage.setItem('hasSeenPropertyGuide', 'true');
+    setShowGuide(false);
+  };
 
   const { data: featuredProperties, isLoading: loadingFeatured } = useQuery<Property[]>({
     queryKey: ["/api/properties/featured"],
@@ -64,6 +134,87 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
+      {/* Welcome Animation for New Users */}
+      <AnimatePresence>
+        {showWelcomeAnimation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl"
+            >
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  rotate: [0, 10, -10, 0]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-16 h-16 bg-grass-500 rounded-full flex items-center justify-center mx-auto mb-4"
+              >
+                <HomeIcon className="w-8 h-8 text-white" />
+              </motion.div>
+              
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-2xl font-bold text-gray-900 mb-2"
+              >
+                Welcome to Rent2Own Kenya!
+              </motion.h2>
+              
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-gray-600 mb-4"
+              >
+                Your journey to homeownership starts here. Let us show you around!
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="flex items-center justify-center text-sm text-gray-500"
+              >
+                <Lightbulb className="w-4 h-4 mr-1" />
+                Interactive guide starting soon...
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Guided Tour */}
+      <GuideTooltip
+        steps={guideSteps}
+        isActive={showGuide}
+        onComplete={handleCompleteGuide}
+        onSkip={handleSkipGuide}
+      />
+
+      {/* Guide Trigger Button for Returning Users */}
+      {!showGuide && !showWelcomeAnimation && !isUserAuthenticated && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1 }}
+          onClick={() => setShowGuide(true)}
+          className="fixed bottom-6 right-6 bg-grass-500 text-white p-3 rounded-full shadow-lg hover:bg-grass-600 transition-colors z-40"
+          title="Take a guided tour"
+        >
+          <Info className="w-6 h-6" />
+        </motion.button>
+      )}
+      
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-grass-50 to-green-100 py-20">
         <div className="absolute inset-0 bg-cover bg-center opacity-10" 
@@ -71,17 +222,34 @@ export default function Home() {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
+            >
               Your Path to 
-              <span className="text-grass-600"> Home Ownership</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="text-grass-600"
+              >
+                 Home Ownership
+              </motion.span>
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto"
+            >
               Discover affordable rent-to-own properties across Kenya. Start renting today and own your dream home tomorrow with flexible payment plans.
-            </p>
+            </motion.p>
             
             <div className="space-y-6">
               {!isUserAuthenticated && (
-                <div className="flex gap-4 justify-center flex-wrap">
+                <div className="cta-section flex gap-4 justify-center flex-wrap">
                   <Button 
                     size="lg" 
                     className="bg-grass-600 hover:bg-grass-700 text-white"
@@ -102,7 +270,7 @@ export default function Home() {
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="border-grass-600 text-grass-600 hover:bg-grass-50"
+                    className="border-grass-600 text-grass-600 hover:bg-grass-50 demo-login-button"
                     onClick={() => window.location.href = '/demo-user'}
                   >
                     Try Demo User
@@ -119,7 +287,9 @@ export default function Home() {
                 </div>
               )}
               
-              <PropertySearch onSearch={handleSearch} />
+              <div className="property-search">
+                <PropertySearch onSearch={handleSearch} />
+              </div>
             </div>
           </div>
         </div>
@@ -151,7 +321,7 @@ export default function Home() {
               ))}
             </div>
           ) : displayProperties.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="featured-properties grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayProperties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
@@ -167,9 +337,11 @@ export default function Home() {
       </section>
 
       {/* Calculator Section */}
-      <section className="py-16 grass-50">
+      <section className="py-16 bg-grass-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <RentCalculator />
+          <div className="rent-calculator">
+            <RentCalculator />
+          </div>
         </div>
       </section>
 
