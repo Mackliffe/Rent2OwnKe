@@ -11,7 +11,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
-import { FileText, User, Briefcase, CreditCard, Shield, CheckCircle } from "lucide-react";
+import { FileText, User, Briefcase, CreditCard, Shield, CheckCircle, ArrowLeft, Home } from "lucide-react";
+import { Link } from "wouter";
 
 export default function LoanApplication() {
   const [, params] = useRoute("/loan-application/:propertyId");
@@ -708,11 +709,27 @@ export default function LoanApplication() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-grass-50 to-grass-100">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="flex items-center space-x-2 text-grass-600 hover:text-grass-700">
+              <ArrowLeft className="h-5 w-5" />
+              <span>Back to Home</span>
+            </Link>
+            <div className="flex items-center space-x-2">
+              <Home className="h-8 w-8 text-grass-600" />
+              <span className="text-xl font-bold text-grass-700">Rent2Own Kenya</span>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Rent-to-Own Loan Application</h1>
-          <p className="text-gray-600">Complete your application to get pre-approved for property financing</p>
+          <h1 className="text-3xl font-bold text-grass-700 mb-2">Rent-to-Own Loan Application</h1>
+          <p className="text-gray-600">Complete your application to secure your dream home</p>
         </div>
 
         {/* Progress Bar */}
