@@ -28,6 +28,8 @@ export interface IStorage {
   // Users
   getAllUsers(): Promise<User[]>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getSellers(): Promise<User[]>;
+  getAccountManagers(): Promise<User[]>;
 }
 
 export type PropertySearchFilters = {
@@ -209,6 +211,14 @@ export class DatabaseStorage implements IStorage {
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
+  }
+
+  async getSellers(): Promise<User[]> {
+    return await db.select().from(users).where(eq(users.role, 'seller'));
+  }
+
+  async getAccountManagers(): Promise<User[]> {
+    return await db.select().from(users).where(eq(users.role, 'account_manager'));
   }
 }
 
@@ -502,6 +512,14 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
+    throw new Error("User management not supported in memory storage");
+  }
+
+  async getSellers(): Promise<User[]> {
+    throw new Error("User management not supported in memory storage");
+  }
+
+  async getAccountManagers(): Promise<User[]> {
     throw new Error("User management not supported in memory storage");
   }
 }

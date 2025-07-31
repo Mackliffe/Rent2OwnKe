@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Navigation from "@/components/navigation";
+import AdminNavigation from "@/components/admin-navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
   if (authLoading || adminLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navigation />
+        <AdminNavigation currentPage="home" />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-grass-600 mx-auto mb-4"></div>
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      <AdminNavigation currentPage="home" />
       
       <div className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

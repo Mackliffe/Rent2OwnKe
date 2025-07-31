@@ -515,6 +515,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get sellers for admin
+  app.get("/api/admin/sellers", async (req, res) => {
+    try {
+      const sellers = await storage.getSellers();
+      res.json(sellers);
+    } catch (error) {
+      console.error("Error getting sellers:", error);
+      res.status(500).json({ message: "Failed to fetch sellers" });
+    }
+  });
+
+  // Get account managers for admin
+  app.get("/api/admin/account-managers", async (req, res) => {
+    try {
+      const accountManagers = await storage.getAccountManagers();
+      res.json(accountManagers);
+    } catch (error) {
+      console.error("Error getting account managers:", error);
+      res.status(500).json({ message: "Failed to fetch account managers" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

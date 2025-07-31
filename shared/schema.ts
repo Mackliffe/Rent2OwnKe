@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, decimal, boolean, jsonb, timestamp, varchar } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -102,6 +103,9 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   role: varchar("role").default("user"), // user, admin
+  userTypes: varchar("user_types").array().default(sql`ARRAY['user']::varchar[]`), // Multiple user types: user, seller, account_manager
+  phone: varchar("phone"),
+  accountManagerId: varchar("account_manager_id").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -17,6 +17,11 @@ import LoanApplication from "@/pages/loan-application";
 import Dashboard from "@/pages/dashboard";
 import AdminDashboard from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
+import AdminProperties from "@/pages/admin-properties";
+import AdminApplications from "@/pages/admin-applications";
+import AdminUsers from "@/pages/admin-users";
+import AdminSellers from "@/pages/admin-sellers";
+import AdminAccountManagers from "@/pages/admin-account-managers";
 import PropertyJourneyPage from "@/pages/property-journey";
 import NotFound from "@/pages/not-found";
 
@@ -38,6 +43,11 @@ function Router() {
       <Route path="/property-journey" component={PropertyJourneyPage} />
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/properties" component={AdminProperties} />
+      <Route path="/admin/applications" component={AdminApplications} />
+      <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/sellers" component={AdminSellers} />
+      <Route path="/admin/account-managers" component={AdminAccountManagers} />
       <Route component={NotFound} />
     </Switch>
   );
