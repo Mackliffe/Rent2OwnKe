@@ -90,15 +90,6 @@ export default function Navigation() {
             >
               AI Recommendations
             </Link>
-            
-            {isUserAuthenticated && (
-              <Link 
-                href="/dashboard" 
-                className={`font-medium ${location === '/dashboard' ? 'text-grass-600' : 'text-gray-700 hover:text-grass-600'}`}
-              >
-                My Dashboard
-              </Link>
-            )}
           </div>
           
           <div className="flex items-center space-x-4">
