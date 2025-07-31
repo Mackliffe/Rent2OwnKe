@@ -246,12 +246,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Property Applications endpoints
   app.get("/api/applications", async (req: any, res) => {
     try {
+      // Check for demo user session first
+      const demoUserId = req.headers['x-demo-user-id'];
+      if (demoUserId) {
+        const applications = await storage.getUserApplications(demoUserId);
+        // Get property details for each application
+        const applicationsWithProperties = await Promise.all(
+          applications.map(async (app: any) => {
+            const property = await storage.getProperty(app.propertyId);
+            return { ...app, property };
+          })
+        );
+        return res.json(applicationsWithProperties);
+      }
+
+      // Regular authenticated user
       if (!req.user?.claims?.sub) {
         return res.status(401).json({ message: "Unauthorized" });
       }
       
       const applications = await storage.getUserApplications(req.user.claims.sub);
-      res.json(applications);
+      // Get property details for each application
+      const applicationsWithProperties = await Promise.all(
+        applications.map(async (app: any) => {
+          const property = await storage.getProperty(app.propertyId);
+          return { ...app, property };
+        })
+      );
+      res.json(applicationsWithProperties);
     } catch (error) {
       console.error("Error getting applications:", error);
       res.status(500).json({ message: "Failed to fetch applications" });

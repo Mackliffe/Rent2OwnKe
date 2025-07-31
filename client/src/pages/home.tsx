@@ -74,7 +74,7 @@ export default function Home() {
             </p>
             
             <div className="space-y-6">
-              <div className="flex gap-4 justify-center">
+              <div className="flex gap-4 justify-center flex-wrap">
                 <Button 
                   size="lg" 
                   className="bg-grass-600 hover:bg-grass-700 text-white"
@@ -91,6 +91,14 @@ export default function Home() {
                   }}
                 >
                   Get Started
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="border-grass-600 text-grass-600 hover:bg-grass-50"
+                  onClick={() => window.location.href = '/demo-user'}
+                >
+                  Try Demo User
                 </Button>
                 <Button 
                   size="lg" 

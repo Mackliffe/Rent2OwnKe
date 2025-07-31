@@ -22,6 +22,7 @@ import AdminApplications from "@/pages/admin-applications";
 import AdminUsers from "@/pages/admin-users";
 import AdminSellers from "@/pages/admin-sellers";
 import AdminAccountManagers from "@/pages/admin-account-managers";
+import DemoUserLogin from "@/pages/demo-user-login";
 import PropertyJourneyPage from "@/pages/property-journey";
 import NotFound from "@/pages/not-found";
 
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/property-journey" component={PropertyJourneyPage} />
       <Route path="/admin-login" component={AdminLogin} />
+      <Route path="/demo-user" component={DemoUserLogin} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/properties" component={AdminProperties} />
       <Route path="/admin/applications" component={AdminApplications} />

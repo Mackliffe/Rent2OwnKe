@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useDemoAuth } from "@/hooks/useDemoAuth";
 import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/navigation";
 import PropertyJourney from "@/components/property-journey";
@@ -7,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatKES } from "@/lib/currency";
-import { Calendar, MapPin, Home, FileText, CreditCard, Clock, CheckCircle, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Calendar, MapPin, Home, FileText, CreditCard, Clock, CheckCircle, ArrowRight, LogOut, User } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import type { PropertyApplication } from "@shared/schema";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -16,26 +17,37 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Dashboard() {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { demoUser, isAuthenticated: isDemoAuthenticated, isLoading: demoLoading, logout: demoLogout } = useDemoAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  // Check if user is authenticated (either regular or demo)
+  const isUserAuthenticated = isAuthenticated || isDemoAuthenticated;
+  const currentUser = user || (demoUser ? {
+    firstName: demoUser.firstName,
+    lastName: demoUser.lastName,
+    email: demoUser.email,
+  } : null);
+  const isLoadingAuth = authLoading || demoLoading;
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (!isLoadingAuth && !isUserAuthenticated) {
       toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
+        title: "Authentication Required",
+        description: "Please sign in to view your dashboard",
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        setLocation("/");
       }, 500);
       return;
     }
-  }, [isAuthenticated, authLoading, toast]);
+  }, [isUserAuthenticated, isLoadingAuth, toast, setLocation]);
 
   const { data: applications = [], isLoading, error } = useQuery<PropertyApplication[]>({
     queryKey: ["/api/applications"],
-    enabled: isAuthenticated,
+    enabled: isUserAuthenticated,
     retry: false,
   });
 
@@ -53,7 +65,7 @@ export default function Dashboard() {
     }
   }, [error, toast]);
 
-  if (authLoading || isLoading) {
+  if (isLoadingAuth || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -69,9 +81,18 @@ export default function Dashboard() {
     );
   }
 
-  if (!isAuthenticated || !user) {
+  if (!isUserAuthenticated || !currentUser) {
     return null; // Will redirect in useEffect
   }
+
+  const handleLogout = () => {
+    if (isDemoAuthenticated) {
+      demoLogout();
+      setLocation("/demo-user");
+    } else {
+      window.location.href = "/api/logout";
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -109,9 +130,27 @@ export default function Dashboard() {
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {user.firstName || user.email}</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Welcome back, {currentUser.firstName}!
+            </h1>
+            <p className="text-gray-600 mt-2">Track your property applications and journey to homeownership</p>
+            {isDemoAuthenticated && (
+              <div className="mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full inline-block">
+                <User className="w-4 h-4 inline mr-1" />
+                Demo User Session
+              </div>
+            )}
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="flex items-center space-x-2"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </Button>
         </div>
 
         {/* Journey Tracker Section */}

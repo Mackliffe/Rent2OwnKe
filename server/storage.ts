@@ -782,6 +782,125 @@ export async function initializeDatabase() {
       await db.insert(properties).values(kenyanProperties as any);
     }
 
+    // Check if users already exist and add sample users and applications
+    const existingUsers = await storage.getAllUsers();
+    if (existingUsers.length <= 1) { // Only admin user exists
+      // Create sample normal user
+      const sampleUser = {
+        id: "user-001",
+        email: "john.mwangi@gmail.com",
+        firstName: "John",
+        lastName: "Mwangi",
+        userTypes: ["user"],
+        role: "user",
+        profileImageUrl: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      await db.insert(users).values([sampleUser]);
+
+      // Create sample applications for the user
+      const properties = await storage.getProperties();
+      const sampleApplications = [
+        {
+          userId: "user-001",
+          propertyId: properties[0]?.id || 1,
+          applicationData: {
+            personalInfo: {
+              fullName: "John Mwangi",
+              email: "john.mwangi@gmail.com",
+              phoneNumber: "+254712345678",
+              dateOfBirth: "1985-05-15",
+              nationalId: "12345678",
+              maritalStatus: "single"
+            },
+            employment: {
+              employmentStatus: "employed",
+              employerName: "Safaricom PLC",
+              jobTitle: "Software Engineer",
+              monthlyIncome: 120000,
+              employmentDuration: "3 years"
+            },
+            financial: {
+              bankName: "Equity Bank",
+              accountNumber: "1234567890",
+              monthlyExpenses: 45000,
+              existingLoans: "No",
+              creditScore: "Good"
+            }
+          },
+          status: "approved",
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+          updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)  // 2 days ago
+        },
+        {
+          userId: "user-001",
+          propertyId: properties[1]?.id || 2,
+          applicationData: {
+            personalInfo: {
+              fullName: "John Mwangi",
+              email: "john.mwangi@gmail.com",
+              phoneNumber: "+254712345678",
+              dateOfBirth: "1985-05-15",
+              nationalId: "12345678",
+              maritalStatus: "single"
+            },
+            employment: {
+              employmentStatus: "employed",
+              employerName: "Safaricom PLC",
+              jobTitle: "Software Engineer",
+              monthlyIncome: 120000,
+              employmentDuration: "3 years"
+            },
+            financial: {
+              bankName: "Equity Bank",
+              accountNumber: "1234567890",
+              monthlyExpenses: 45000,
+              existingLoans: "No",
+              creditScore: "Good"
+            }
+          },
+          status: "pending",
+          createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+          updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)  // 3 days ago
+        },
+        {
+          userId: "user-001",
+          propertyId: properties[2]?.id || 3,
+          applicationData: {
+            personalInfo: {
+              fullName: "John Mwangi",
+              email: "john.mwangi@gmail.com",
+              phoneNumber: "+254712345678",
+              dateOfBirth: "1985-05-15",
+              nationalId: "12345678",
+              maritalStatus: "single"
+            },
+            employment: {
+              employmentStatus: "employed",
+              employerName: "Safaricom PLC",
+              jobTitle: "Software Engineer",
+              monthlyIncome: 120000,
+              employmentDuration: "3 years"
+            },
+            financial: {
+              bankName: "Equity Bank",
+              accountNumber: "1234567890",
+              monthlyExpenses: 45000,
+              existingLoans: "No",
+              creditScore: "Good"
+            }
+          },
+          status: "under_review",
+          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+          updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)  // 1 day ago
+        }
+      ];
+
+      await db.insert(propertyApplications).values(sampleApplications);
+    }
+
     console.log("Database initialized successfully");
   } catch (error) {
     console.error("Error initializing database:", error);
