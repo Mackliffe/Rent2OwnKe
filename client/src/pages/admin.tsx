@@ -528,13 +528,13 @@ export default function AdminDashboard() {
             <div>
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/admin-inspections" className="hover:text-grass-400">Property Inspections</Link></li>
-                <li><Link href="/admin-sellers" className="hover:text-grass-400">Seller Management</Link></li>
-                <li><Link href="/admin-account-managers" className="hover:text-grass-400">Account Managers</Link></li>
-                <li><Link href="/admin-properties" className="hover:text-grass-400">Property Management</Link></li>
-                <li><Link href="/admin-users" className="hover:text-grass-400">User Management</Link></li>
-                <li><Link href="/admin-applications" className="hover:text-grass-400">Loan Applications</Link></li>
-                <li><Link href="/" className="hover:text-grass-400">Return to Main Site</Link></li>
+                <li><a href="/admin-inspections" className="hover:text-grass-400 cursor-pointer">Property Inspections</a></li>
+                <li><a href="/admin-sellers" className="hover:text-grass-400 cursor-pointer">Seller Management</a></li>
+                <li><a href="/admin-account-managers" className="hover:text-grass-400 cursor-pointer">Account Managers</a></li>
+                <li><a href="/admin-properties" className="hover:text-grass-400 cursor-pointer">Property Management</a></li>
+                <li><a href="/admin-users" className="hover:text-grass-400 cursor-pointer">User Management</a></li>
+                <li><a href="/admin-applications" className="hover:text-grass-400 cursor-pointer">Loan Applications</a></li>
+                <li><a href="/" className="hover:text-grass-400 cursor-pointer">Return to Main Site</a></li>
               </ul>
             </div>
             
