@@ -559,6 +559,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Inspection Booking API
+  app.post("/api/property-inspection", async (req, res) => {
+    try {
+      const inspectionData = req.body;
+      
+      // Validate required fields
+      const requiredFields = [
+        'fullName', 'phoneNumber', 'email', 'propertyAddress', 
+        'county', 'subcounty', 'inspectionDate', 'inspectionTime'
+      ];
+      
+      for (const field of requiredFields) {
+        if (!inspectionData[field]) {
+          return res.status(400).json({ 
+            message: `${field} is required` 
+          });
+        }
+      }
+
+      // Generate a reference number
+      const referenceNumber = `R2O-${Date.now().toString().slice(-6)}`;
+      
+      // In a real application, you would:
+      // 1. Save the inspection booking to the database
+      // 2. Send confirmation emails/SMS
+      // 3. Schedule the inspection with the team
+      // 4. Process the uploaded documents
+      
+      console.log("Property Inspection Booking:", {
+        ...inspectionData,
+        referenceNumber,
+        createdAt: new Date().toISOString()
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "Property inspection booked successfully",
+        referenceNumber,
+        estimatedCost: "KShs 5,000"
+      });
+    } catch (error) {
+      console.error("Error booking property inspection:", error);
+      res.status(500).json({ 
+        message: "Failed to book property inspection" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

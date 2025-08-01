@@ -29,6 +29,12 @@ The application features a modern, accessible UI with a custom grass-green color
     - **Enhanced User Experience**: Welcome animations, progressive feature disclosure, auto-play tours, and personalized guidance for new users.
     - **Risk Calculator**: An interactive tool assessing property investment risk specific to the Kenyan market.
     - **Property Journey Progress Tracker**: A playful visualization of the rent-to-own process with milestone animations.
+    - **House Selling Platform**: Comprehensive property inspection booking system for sellers with:
+        - Professional inspection booking form with KYC requirements
+        - Document upload support (National ID, KRA PIN)
+        - Inspection scheduling with date/time selection
+        - Pricing transparency (minimum KShs 5,000)
+        - Kenyan county/subcounty selection
 
 ### System Design Choices
 The system employs a clear separation of concerns with distinct frontend and backend architectures. Data flow is managed via RESTful API calls, optimized with client-side caching using TanStack Query. Server-side sessions are stored in PostgreSQL for robust session management. The architecture supports integration with external Kenyan real estate APIs for comprehensive data aggregation.

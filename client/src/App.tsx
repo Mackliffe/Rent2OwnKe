@@ -24,6 +24,7 @@ import AdminSellers from "@/pages/admin-sellers";
 import AdminAccountManagers from "@/pages/admin-account-managers";
 import DemoUserLogin from "@/pages/demo-user-login";
 import PropertyJourneyPage from "@/pages/property-journey";
+import SellHouse from "@/pages/sell-house";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/loan-application/:propertyId" component={LoanApplication} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/property-journey" component={PropertyJourneyPage} />
+      <Route path="/sell-house" component={SellHouse} />
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/demo-user" component={DemoUserLogin} />
       <Route path="/admin" component={AdminDashboard} />
