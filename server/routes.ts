@@ -590,8 +590,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const firstName = nameParts[0] || '';
         const lastName = nameParts.slice(1).join(' ') || '';
         
+        // Generate unique seller ID
+        const sellerId = `seller-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        
+        console.log('Creating seller with ID:', sellerId);
+        
         // Create new seller user
         seller = await storage.createUser({
+          id: sellerId,
           email: inspectionData.email,
           firstName,
           lastName,

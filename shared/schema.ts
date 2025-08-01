@@ -194,6 +194,7 @@ export type PropertyInspection = typeof propertyInspections.$inferSelect;
 export type InsertPropertyInspection = z.infer<typeof insertPropertyInspectionSchema>;
 
 export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
 export type UpsertUser = typeof users.$inferInsert;
 export type PropertyApplication = typeof propertyApplications.$inferSelect;
 export type InsertPropertyApplication = typeof propertyApplications.$inferInsert;

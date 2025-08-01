@@ -232,11 +232,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(user: UpsertUser): Promise<User> {
-    const [newUser] = await db
-      .insert(users)
-      .values(user)
-      .returning();
-    return newUser;
+    // Generate ID if not provided
+    const userId = user.id || `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    const userData = {
+      ...user,
+      id: userId
+    };
+    
+    console.log('Creating user with data:', userData);
+    
+    try {
+      const [newUser] = await db
+        .insert(users)
+        .values(userData)
+        .returning();
+      return newUser;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   }
 
   async updateUser(id: string, updates: Partial<User>): Promise<User> {
