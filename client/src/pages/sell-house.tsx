@@ -28,15 +28,21 @@ import {
 import { Home, Upload, Calendar, CheckCircle, Phone, Mail, MapPin, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-// Kenyan counties
+// Kenyan counties (fixed duplicate Kericho)
 const kenyanCounties = [
   "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Nyeri", "Machakos", "Meru",
   "Thika", "Kitale", "Malindi", "Garissa", "Kakamega", "Embu", "Kericho", "Migori",
   "Siaya", "Naivasha", "Voi", "Bungoma", "Homa Bay", "Kitui", "Kapenguria", "Moyale",
   "Chuka", "Kiambu", "Murang'a", "Kirinyaga", "Nyandarua", "Nyandare", "Tharaka Nithi",
   "Laikipia", "Samburu", "Trans Nzoia", "Uasin Gishu", "Elgeyo Marakwet", "Nandi",
-  "Baringo", "Bomet", "Kericho", "Kajiado", "Makueni", "Taita Taveta", "Lamu", "Tana River",
+  "Baringo", "Bomet", "Kajiado", "Makueni", "Taita Taveta", "Lamu", "Tana River",
   "Kilifi", "Kwale", "Turkana", "West Pokot", "Marsabit", "Isiolo", "Mandera", "Wajir"
+];
+
+// Property types
+const propertyTypes = [
+  "Apartment", "House", "Townhouse", "Villa", "Bungalow", "Maisonette", 
+  "Studio", "Penthouse", "Commercial", "Land", "Warehouse", "Office Space"
 ];
 
 // Form validation schema
@@ -44,6 +50,7 @@ const sellHouseSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   phoneNumber: z.string().regex(/^(\+254|0)[17]\d{8}$/, "Please enter a valid Kenyan phone number"),
   email: z.string().email("Please enter a valid email address"),
+  propertyType: z.string().min(1, "Please select a property type"),
   propertyAddress: z.string().min(10, "Please provide a detailed property address"),
   county: z.string().min(1, "Please select a county"),
   subcounty: z.string().min(2, "Please enter the subcounty"),
@@ -67,6 +74,7 @@ export default function SellHouse() {
       fullName: "",
       phoneNumber: "",
       email: "",
+      propertyType: "",
       propertyAddress: "",
       county: "",
       subcounty: "",
@@ -91,10 +99,25 @@ export default function SellHouse() {
         }
       });
 
+      // Convert FormData to JSON for the API
+      const jsonData: any = {};
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === 'nationalIdFront' || key === 'nationalIdBack' || key === 'kraPin') {
+          // For now, just indicate that files were uploaded
+          // In a real app, you'd upload files to cloud storage first
+          jsonData[key] = value?.[0] ? 'file-uploaded' : null;
+        } else {
+          jsonData[key] = value;
+        }
+      });
+
       // Submit to API
       const response = await fetch('/api/property-inspection', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
       });
 
       if (!response.ok) {
@@ -265,6 +288,31 @@ export default function SellHouse() {
                       <MapPin className="w-5 h-5 mr-2" />
                       Property Information
                     </h3>
+                    
+                    <FormField
+                      control={form.control}
+                      name="propertyType"
+                      render={({ field }) => (
+                        <FormItem className="mb-6">
+                          <FormLabel>Property Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select property type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="max-h-60">
+                              {propertyTypes.map((type) => (
+                                <SelectItem key={type} value={type}>
+                                  {type}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     
                     <FormField
                       control={form.control}

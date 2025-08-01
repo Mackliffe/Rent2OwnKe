@@ -132,6 +132,54 @@ export const propertyApplicationsRelations = relations(propertyApplications, ({ 
   }),
 }));
 
+// Property Inspections
+export const propertyInspections = pgTable("property_inspections", {
+  id: serial("id").primaryKey(),
+  // Seller Information
+  fullName: text("full_name").notNull(),
+  phoneNumber: text("phone_number").notNull(),
+  email: text("email").notNull(),
+  // Property Information
+  propertyType: text("property_type").notNull(),
+  propertyAddress: text("property_address").notNull(),
+  county: text("county").notNull(),
+  subcounty: text("subcounty").notNull(),
+  // Document paths (in real app, these would be file storage paths)
+  nationalIdFront: text("national_id_front"),
+  nationalIdBack: text("national_id_back"),
+  kraPin: text("kra_pin"),
+  // Inspection Details
+  inspectionDate: text("inspection_date").notNull(),
+  inspectionTime: text("inspection_time").notNull(),
+  // Status and metadata
+  status: text("status").default("booked").notNull(), // 'booked', 'completed', 'cancelled'
+  referenceNumber: text("reference_number").notNull(),
+  estimatedCost: text("estimated_cost").default("KShs 5,000"),
+  // Property details for listing (populated after inspection)
+  propertyTitle: text("property_title"),
+  propertyDescription: text("property_description"),
+  bedrooms: integer("bedrooms"),
+  bathrooms: integer("bathrooms"),
+  floorArea: integer("floor_area"),
+  price: integer("price"),
+  mainImage: text("main_image").default("/api/placeholder/400/300"), // placeholder until inspection
+  gallery: jsonb("gallery").$type<string[]>().default([]),
+  rooms: jsonb("rooms").$type<PropertyRoom[]>().default([]),
+  amenities: jsonb("amenities").$type<string[]>().default([]),
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPropertyInspectionSchema = createInsertSchema(propertyInspections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PropertyInspection = typeof propertyInspections.$inferSelect;
+export type InsertPropertyInspection = z.infer<typeof insertPropertyInspectionSchema>;
+
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
 export type PropertyApplication = typeof propertyApplications.$inferSelect;

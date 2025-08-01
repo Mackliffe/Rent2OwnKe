@@ -1,4 +1,4 @@
-import { properties, locations, propertyApplications, users, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom, type PropertyApplication, type InsertPropertyApplication, type User } from "@shared/schema";
+import { properties, locations, propertyApplications, users, propertyInspections, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom, type PropertyApplication, type InsertPropertyApplication, type User, type PropertyInspection, type InsertPropertyInspection } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte } from "drizzle-orm";
 
@@ -30,6 +30,12 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getSellers(): Promise<User[]>;
   getAccountManagers(): Promise<User[]>;
+  
+  // Property Inspections
+  getPropertyInspections(): Promise<PropertyInspection[]>;
+  getPropertyInspection(id: number): Promise<PropertyInspection | undefined>;
+  createPropertyInspection(inspection: InsertPropertyInspection): Promise<PropertyInspection>;
+  updatePropertyInspection(id: number, updates: Partial<PropertyInspection>): Promise<PropertyInspection>;
 }
 
 export type PropertySearchFilters = {
@@ -219,6 +225,33 @@ export class DatabaseStorage implements IStorage {
 
   async getAccountManagers(): Promise<User[]> {
     return await db.select().from(users).where(eq(users.role, 'account_manager'));
+  }
+
+  // Property Inspections methods
+  async getPropertyInspections(): Promise<PropertyInspection[]> {
+    return await db.select().from(propertyInspections);
+  }
+
+  async getPropertyInspection(id: number): Promise<PropertyInspection | undefined> {
+    const [inspection] = await db.select().from(propertyInspections).where(eq(propertyInspections.id, id));
+    return inspection || undefined;
+  }
+
+  async createPropertyInspection(inspection: InsertPropertyInspection): Promise<PropertyInspection> {
+    const [newInspection] = await db
+      .insert(propertyInspections)
+      .values(inspection)
+      .returning();
+    return newInspection;
+  }
+
+  async updatePropertyInspection(id: number, updates: Partial<PropertyInspection>): Promise<PropertyInspection> {
+    const [updated] = await db
+      .update(propertyInspections)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(propertyInspections.id, id))
+      .returning();
+    return updated;
   }
 }
 

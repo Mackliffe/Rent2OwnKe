@@ -566,7 +566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Validate required fields
       const requiredFields = [
-        'fullName', 'phoneNumber', 'email', 'propertyAddress', 
+        'fullName', 'phoneNumber', 'email', 'propertyType', 'propertyAddress', 
         'county', 'subcounty', 'inspectionDate', 'inspectionTime'
       ];
       
@@ -581,29 +581,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate a reference number
       const referenceNumber = `R2O-${Date.now().toString().slice(-6)}`;
       
-      // In a real application, you would:
-      // 1. Save the inspection booking to the database
-      // 2. Send confirmation emails/SMS
-      // 3. Schedule the inspection with the team
-      // 4. Process the uploaded documents
-      
-      console.log("Property Inspection Booking:", {
-        ...inspectionData,
+      // Create inspection record in database
+      const inspection = await storage.createPropertyInspection({
+        fullName: inspectionData.fullName,
+        phoneNumber: inspectionData.phoneNumber,
+        email: inspectionData.email,
+        propertyType: inspectionData.propertyType,
+        propertyAddress: inspectionData.propertyAddress,
+        county: inspectionData.county,
+        subcounty: inspectionData.subcounty,
+        inspectionDate: inspectionData.inspectionDate,
+        inspectionTime: inspectionData.inspectionTime,
         referenceNumber,
-        createdAt: new Date().toISOString()
+        status: "booked",
+        estimatedCost: "KShs 5,000",
+        // Document uploads would be processed here in real implementation
+        nationalIdFront: "uploaded-document-path",
+        nationalIdBack: "uploaded-document-path", 
+        kraPin: "uploaded-document-path"
       });
+
+      console.log("Property Inspection Booking Created:", inspection);
 
       res.status(201).json({
         success: true,
         message: "Property inspection booked successfully",
         referenceNumber,
-        estimatedCost: "KShs 5,000"
+        estimatedCost: "KShs 5,000",
+        inspection
       });
     } catch (error) {
       console.error("Error booking property inspection:", error);
       res.status(500).json({ 
         message: "Failed to book property inspection" 
       });
+    }
+  });
+
+  // Get property inspections for admin
+  app.get("/api/admin/inspections", async (req, res) => {
+    try {
+      const inspections = await storage.getPropertyInspections();
+      res.json(inspections);
+    } catch (error) {
+      console.error("Error getting property inspections:", error);
+      res.status(500).json({ message: "Failed to fetch property inspections" });
     }
   });
 
