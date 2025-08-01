@@ -132,10 +132,16 @@ export const propertyApplicationsRelations = relations(propertyApplications, ({ 
   }),
 }));
 
+export const usersRelations = relations(users, ({ many }) => ({
+  propertyInspections: many(propertyInspections),
+  applications: many(propertyApplications),
+}));
+
 // Property Inspections
 export const propertyInspections = pgTable("property_inspections", {
   id: serial("id").primaryKey(),
-  // Seller Information
+  // Seller Information (reference to user who is a seller)
+  sellerId: varchar("seller_id").references(() => users.id),
   fullName: text("full_name").notNull(),
   phoneNumber: text("phone_number").notNull(),
   email: text("email").notNull(),
@@ -170,6 +176,13 @@ export const propertyInspections = pgTable("property_inspections", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const propertyInspectionsRelations = relations(propertyInspections, ({ one }) => ({
+  seller: one(users, {
+    fields: [propertyInspections.sellerId],
+    references: [users.id],
+  }),
+}));
 
 export const insertPropertyInspectionSchema = createInsertSchema(propertyInspections).omit({
   id: true,

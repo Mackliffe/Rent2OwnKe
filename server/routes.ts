@@ -581,8 +581,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate a reference number
       const referenceNumber = `R2O-${Date.now().toString().slice(-6)}`;
       
+      // Check if seller already exists, if not create one
+      let seller = await storage.getUserByEmail(inspectionData.email);
+      
+      if (!seller) {
+        // Extract first and last name from full name
+        const nameParts = inspectionData.fullName.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        // Create new seller user
+        seller = await storage.createUser({
+          email: inspectionData.email,
+          firstName,
+          lastName,
+          phone: inspectionData.phoneNumber,
+          role: 'seller',
+          userTypes: ['seller']
+        });
+      } else if (!seller.userTypes?.includes('seller')) {
+        // Add seller type to existing user
+        const updatedUserTypes = [...(seller.userTypes || []), 'seller'];
+        seller = await storage.updateUser(seller.id, { 
+          userTypes: updatedUserTypes,
+          phone: inspectionData.phoneNumber // Update phone if not set
+        });
+      }
+      
       // Create inspection record in database
       const inspection = await storage.createPropertyInspection({
+        sellerId: seller.id,
         fullName: inspectionData.fullName,
         phoneNumber: inspectionData.phoneNumber,
         email: inspectionData.email,
@@ -621,11 +649,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get property inspections for admin
   app.get("/api/admin/inspections", async (req, res) => {
     try {
-      const inspections = await storage.getPropertyInspections();
+      const inspections = await storage.getPropertyInspectionsWithSellers();
       res.json(inspections);
     } catch (error) {
       console.error("Error getting property inspections:", error);
       res.status(500).json({ message: "Failed to fetch property inspections" });
+    }
+  });
+
+  // Get sellers with their inspections for admin
+  app.get("/api/admin/sellers", async (req, res) => {
+    try {
+      const sellers = await storage.getSellersWithInspections();
+      res.json(sellers);
+    } catch (error) {
+      console.error("Error getting sellers:", error);
+      res.status(500).json({ message: "Failed to fetch sellers" });
     }
   });
 

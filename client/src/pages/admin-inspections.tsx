@@ -159,6 +159,11 @@ export default function AdminInspections() {
                           <div className="flex items-center text-gray-600">
                             <div className="w-4 h-4 mr-2" />
                             <span>{inspection.fullName}</span>
+                            {inspection.seller && (
+                              <Badge variant="outline" className="ml-2 text-xs">
+                                Registered Seller
+                              </Badge>
+                            )}
                           </div>
                           <div className="flex items-center text-gray-600">
                             <Phone className="w-4 h-4 mr-2" />
@@ -168,6 +173,12 @@ export default function AdminInspections() {
                             <Mail className="w-4 h-4 mr-2" />
                             <span>{inspection.email}</span>
                           </div>
+                          {inspection.seller && (
+                            <div className="flex items-center text-gray-600">
+                              <div className="w-4 h-4 mr-2" />
+                              <span>Seller ID: {inspection.seller.id}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
 

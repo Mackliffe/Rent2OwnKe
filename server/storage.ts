@@ -1,6 +1,6 @@
-import { properties, locations, propertyApplications, users, propertyInspections, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom, type PropertyApplication, type InsertPropertyApplication, type User, type PropertyInspection, type InsertPropertyInspection } from "@shared/schema";
+import { properties, locations, propertyApplications, users, propertyInspections, type Property, type InsertProperty, type Location, type InsertLocation, type PropertyRoom, type PropertyApplication, type InsertPropertyApplication, type User, type UpsertUser, type PropertyInspection, type InsertPropertyInspection } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, lte } from "drizzle-orm";
+import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Properties
@@ -30,12 +30,16 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getSellers(): Promise<User[]>;
   getAccountManagers(): Promise<User[]>;
+  createUser(user: UpsertUser): Promise<User>;
+  updateUser(id: string, updates: Partial<User>): Promise<User>;
   
   // Property Inspections
   getPropertyInspections(): Promise<PropertyInspection[]>;
+  getPropertyInspectionsWithSellers(): Promise<any[]>;
   getPropertyInspection(id: number): Promise<PropertyInspection | undefined>;
   createPropertyInspection(inspection: InsertPropertyInspection): Promise<PropertyInspection>;
   updatePropertyInspection(id: number, updates: Partial<PropertyInspection>): Promise<PropertyInspection>;
+  getSellersWithInspections(): Promise<any[]>;
 }
 
 export type PropertySearchFilters = {
@@ -220,16 +224,48 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSellers(): Promise<User[]> {
-    return await db.select().from(users).where(eq(users.role, 'seller'));
+    return await db.select().from(users).where(sql`'seller' = ANY(${users.userTypes})`);
   }
 
   async getAccountManagers(): Promise<User[]> {
-    return await db.select().from(users).where(eq(users.role, 'account_manager'));
+    return await db.select().from(users).where(sql`'account_manager' = ANY(${users.userTypes})`);
+  }
+
+  async createUser(user: UpsertUser): Promise<User> {
+    const [newUser] = await db
+      .insert(users)
+      .values(user)
+      .returning();
+    return newUser;
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User> {
+    const [updated] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return updated;
   }
 
   // Property Inspections methods
   async getPropertyInspections(): Promise<PropertyInspection[]> {
     return await db.select().from(propertyInspections);
+  }
+
+  async getPropertyInspectionsWithSellers(): Promise<any[]> {
+    const results = await db
+      .select({
+        inspection: propertyInspections,
+        seller: users,
+      })
+      .from(propertyInspections)
+      .leftJoin(users, eq(propertyInspections.sellerId, users.id));
+
+    return results.map(result => ({
+      ...result.inspection,
+      seller: result.seller,
+    }));
   }
 
   async getPropertyInspection(id: number): Promise<PropertyInspection | undefined> {
@@ -252,6 +288,35 @@ export class DatabaseStorage implements IStorage {
       .where(eq(propertyInspections.id, id))
       .returning();
     return updated;
+  }
+
+  async getSellersWithInspections(): Promise<any[]> {
+    const results = await db
+      .select({
+        seller: users,
+        inspection: propertyInspections,
+      })
+      .from(users)
+      .leftJoin(propertyInspections, eq(users.id, propertyInspections.sellerId))
+      .where(sql`'seller' = ANY(${users.userTypes})`);
+
+    // Group inspections by seller
+    const sellersMap = new Map();
+    
+    results.forEach(result => {
+      if (!sellersMap.has(result.seller.id)) {
+        sellersMap.set(result.seller.id, {
+          ...result.seller,
+          inspections: []
+        });
+      }
+      
+      if (result.inspection) {
+        sellersMap.get(result.seller.id).inspections.push(result.inspection);
+      }
+    });
+
+    return Array.from(sellersMap.values());
   }
 }
 
