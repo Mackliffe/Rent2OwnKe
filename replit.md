@@ -39,6 +39,12 @@ The application features a modern, accessible UI with a custom grass-green color
 ### System Design Choices
 The system employs a clear separation of concerns with distinct frontend and backend architectures. Data flow is managed via RESTful API calls, optimized with client-side caching using TanStack Query. Server-side sessions are stored in PostgreSQL for robust session management. The architecture supports integration with external Kenyan real estate APIs for comprehensive data aggregation.
 
+## Recent Changes
+- **2025-08-01**: Fixed property inspection booking database error with unique seller ID generation
+- **2025-08-01**: Successfully integrated seller creation from inspection forms 
+- **2025-08-01**: Added comprehensive admin footer with quick navigation links to Inspections and Sellers
+- **2025-08-01**: Created comprehensive GitHub README documentation
+
 ## External Dependencies
 
 ### UI & Styling
